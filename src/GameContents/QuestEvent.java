@@ -18,4 +18,17 @@ public class QuestEvent extends GameContent {
         participants = new ArrayList<>();
     }
 
+    // check name
+    public boolean checkTitle(String title) {
+        return title == questTitle;
+    }
+
+    public void setName(String title) {
+        questTitle = title;
+    }
+
+    public int getQuestID() {
+        return questID;
+    }
+
 }

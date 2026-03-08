@@ -14,4 +14,13 @@ public class Campaign extends GameContent {
         events = new ArrayList<>();
 
     }
+
+    // check name
+    public boolean checkName(String name) {
+        return name == campaignName;
+    }
+
+    public void setName(String name) {
+        campaignName = name;
+    }
 }

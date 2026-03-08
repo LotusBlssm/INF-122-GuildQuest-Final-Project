@@ -15,4 +15,13 @@ public class GameCharacter extends GameContent {
         characterLevel = charLevel;
         this.userID = userID;
     }
+
+    // check name
+    public boolean checkName(String name) {
+        return name == characterName;
+    }
+
+    public void setName(String name) {
+        characterName = name;
+    }
 }

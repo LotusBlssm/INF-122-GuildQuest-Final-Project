@@ -20,4 +20,17 @@ public class User extends GameContent {
         characters = new ArrayList<>();
         campaigns = new ArrayList<>();
     }
+
+    // check name
+    public boolean checkName(String name) {
+        return name == userName;
+    }
+
+    public void setName(String name) {
+        userName = name;
+    }
+
+    public void setRealm(int id) {
+        currentRealmID = id;
+    }
 }
