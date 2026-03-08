@@ -37,6 +37,13 @@
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.11.0</version>
+          <configuration>
+            <excludes>
+              <exclude>**/tempSend.java</exclude>
+              <exclude>**/ui/**</exclude>
+              <exclude>**/entities/**</exclude>
+            </excludes>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>

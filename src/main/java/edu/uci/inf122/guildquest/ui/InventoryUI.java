@@ -1,0 +1,84 @@
+package edu.uci.inf122.guildquest.ui;
+
+// import RPGDomain.Character;
+// import RPGDomain.Inventory;
+// import RPGDomain.Item;
+
+public class InventoryUI {
+    private static final Page page = new Page();
+    public static void manageInventory(Character character) {
+        String prompt = """
+                1 --- See Inventory
+                2 --- Throw Away Item(s)
+                3 --- Add Item(s)
+                0 --- exit
+                """;
+        int choice = -1;
+        while (choice != 0) {
+            choice = page.acceptIntUntil(prompt, 3);
+            page.nextScreen();
+            switch (choice) {
+                case 0-> page.print("leaving inventory\n");
+                case 1-> selectInventory(character);
+                case 2-> removeItem(character);
+                case 3-> addItems(character);
+            }
+        }
+    }
+    private static int printAndQueryInventory(Character character) {
+        return printAndQueryInventory(character, "");
+    }
+    private static int printAndQueryInventory(Character character, String extraPrompt){
+        Inventory inv = character.getInventory();
+        if (inv.getItems().isEmpty()){
+            page.print("Sorry, there are no items. Please exit.\n");
+            return -1;
+        }
+        int i = 1;
+        StringBuilder prompt = new StringBuilder("Choose an item " + extraPrompt + '\n');
+        prompt.append("0 --- go back\n");
+        for (Item item : inv.getItems()){
+            prompt.append(i).append(" --- ").append(item.getName()).append('\n');
+            ++i;
+        }
+        int input = -1;
+        input = page.acceptIntUntil(prompt.toString(), i-1);
+        page.nextScreen();
+        return input-1;
+    }
+    private static void selectInventory(Character character){
+        int choice = printAndQueryInventory(character, "to see more options");
+        if (choice == -1) return;
+        else displayItem(character.getInventory().getItems().get(choice));
+    }
+    private static void displayItem(Item item){
+        page.print(item.getName() + " --- " + item.getDesc() + " " + item.getRarity() + '\n');
+    }
+    public static void removeItem(Character character){
+        int valid = page.acceptIntUntil("Are you sure you want to remove an item?\n1 --- yes\n0 --- no\n", 1);
+        if (valid == 0) return;
+        int choice = printAndQueryInventory(character, "to throw away");
+        if (choice == -1) return;
+        boolean res = character.getInventory().getItems().remove(
+                character.getInventory().getItems().get(choice)
+        );
+        if (res == false) page.print("ERROR: ITEM WAS NOT REMOVED");
+    }
+    private static void addItems(Character character){
+        String name;
+        while (true){
+            if (addItem(character) == null) break;
+        }
+    }
+    public static Item addItem(Character character){
+        int valid = page.acceptIntUntil("Are you sure you want to add an item?\n1 --- yes\n0 --- no\n", 1);
+        if (valid == 0) return null;
+        String name = page.acceptStrWithValidation("Enter a name for this item:\n");
+        String desc = page.acceptStrWithValidation("Enter a description: \n");
+        String rarity = page.acceptStrWithValidation("Enter a rarity: \n");
+        Item newItem = new Item(name, desc, null);
+        character.getInventory().getItems().add(newItem);
+        page.nextScreen();
+        return newItem;
+    }
+}
