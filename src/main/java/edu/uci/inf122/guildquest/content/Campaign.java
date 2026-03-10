@@ -17,7 +17,7 @@ public class Campaign extends GameContent {
 
     // check name
     public boolean checkName(String name) {
-        return name == campaignName;
+        return name.equals(campaignName);
     }
 
     public void setName(String name) {

@@ -23,7 +23,7 @@ public class User extends GameContent {
 
     // check name
     public boolean checkName(String name) {
-        return name == userName;
+        return name.equals(userName);
     }
 
     public void setName(String name) {

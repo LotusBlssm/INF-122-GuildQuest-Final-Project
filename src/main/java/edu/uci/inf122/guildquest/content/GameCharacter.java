@@ -18,7 +18,7 @@ public class GameCharacter extends GameContent {
 
     // check name
     public boolean checkName(String name) {
-        return name == characterName;
+        return name.equals(characterName);
     }
 
     public void setName(String name) {
