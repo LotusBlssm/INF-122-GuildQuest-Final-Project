@@ -1,6 +1,5 @@
-package ViewsAndTimelines;
+package edu.uci.inf122.guildquest.ui;
 
-import Core.User;
 
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Array;
@@ -10,9 +9,10 @@ import java.util.*;
 import java.util.function.IntBinaryOperator;
 import java.util.function.UnaryOperator;
 
-IMPATIENT=true; // if true, skips validation for string inputs.
+
 
 public class Page {
+    private boolean IMPATIENT=true; // if true, skips validation for string inputs.
     private static Scanner scanner = new Scanner(System.in);
     private StringBuilder str;
     private static Page page;
