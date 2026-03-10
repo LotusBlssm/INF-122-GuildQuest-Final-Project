@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import edu.uci.inf122.guildquest.content.GameCharacter;
 import edu.uci.inf122.guildquest.content.QuestEvent;
 
+import java.util.UUID;
+
 public class QuestEventManager {
-    private int campaignID;
+    private UUID campaignID;
     private List<QuestEvent> questEvents;
 
     // no singleton pattern
-    public QuestEventManager(int id) {
+    public QuestEventManager(UUID id) {
         campaignID = id;
         questEvents = new ArrayList<>();
     }
