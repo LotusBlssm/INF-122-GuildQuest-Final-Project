@@ -2,13 +2,14 @@ package edu.uci.inf122.guildquest.content;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Campaign extends GameContent {
-    private int campaignID;
+    private UUID campaignID;
     private String campaignName;
     private List<QuestEvent> events;
 
-    public Campaign(int id, String name) {
+    public Campaign(UUID id, String name) {
         campaignID = id;
         campaignName = name;
         events = new ArrayList<>();

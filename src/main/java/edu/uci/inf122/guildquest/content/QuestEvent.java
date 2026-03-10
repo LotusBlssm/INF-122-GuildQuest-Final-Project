@@ -2,16 +2,17 @@ package edu.uci.inf122.guildquest.content;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class QuestEvent extends GameContent {
     // privates:
-    private int questID;
+    private UUID questID;
     private String questTitle;
     private Realm realm;
     private List<GameCharacter> participants;
 
     // constructor:
-    public QuestEvent(int id, String title, Realm realm) {
+    public QuestEvent(UUID id, String title, Realm realm) {
         questID = id;
         questTitle = title;
         this.realm = realm;
@@ -27,7 +28,7 @@ public class QuestEvent extends GameContent {
         questTitle = title;
     }
 
-    public int getQuestID() {
+    public UUID getQuestID() {
         return questID;
     }
 

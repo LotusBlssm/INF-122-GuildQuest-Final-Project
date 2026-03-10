@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import edu.uci.inf122.guildquest.content.GameCharacter;
 import edu.uci.inf122.guildquest.content.User;
 
+import java.util.UUID;
+
 public class GameCharacterManager {
-    private int userID;
+    private UUID userID;
     private List<GameCharacter> characters;
 
     // no singleton
-    public GameCharacterManager(int id) {
+    public GameCharacterManager(UUID id) {
         userID = id;
         characters = new ArrayList<>();
     }

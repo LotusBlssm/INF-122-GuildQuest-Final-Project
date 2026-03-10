@@ -1,15 +1,17 @@
 package edu.uci.inf122.guildquest.content;
 
+import java.util.UUID;
+
 public class GameCharacter extends GameContent {
     // privates:
     private String characterName;
     private String characterClass;
     private int characterLevel;
-    private int userID;
+    private UUID userID;
     // private Inventory inventory;
 
     // constructor:
-    public GameCharacter(String charName, String charClass, int charLevel, int userID) {
+    public GameCharacter(String charName, String charClass, int charLevel, UUID userID) {
         characterName = charName;
         characterClass = charClass;
         characterLevel = charLevel;
