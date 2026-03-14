@@ -5,6 +5,9 @@ public class TimeRule {
     private double multiplier;
 
     public TimeRule(int offsetMinutes, double multiplier) {
+        if (multiplier == 0.0) {
+            throw new IllegalArgumentException("multiplier must not be 0.0");
+        }
         this.offsetMinutes = offsetMinutes;
         this.multiplier = multiplier;
     }
