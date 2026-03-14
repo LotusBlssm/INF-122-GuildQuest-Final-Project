@@ -2,18 +2,19 @@ package edu.uci.inf122.guildquest.content;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class User extends GameContent {
-    private int userID;
+    private UUID userID;
     private String userName;
-    private int currentRealmID;
+    private UUID currentRealmID;
     // private Settings userSetting;
     private List<GameCharacter> characters;
     private List<Campaign> campaigns;
     // private Time userTime;
 
     // constructor:
-    public User(int id, String name, int realmID) {
+    public User(UUID id, String name, UUID realmID) {
         userID = id;
         userName = name;
         currentRealmID = realmID;
@@ -23,14 +24,14 @@ public class User extends GameContent {
 
     // check name
     public boolean checkName(String name) {
-        return name == userName;
+        return name.equals(userName);
     }
 
     public void setName(String name) {
         userName = name;
     }
 
-    public void setRealm(int id) {
+    public void setRealm(UUID id) {
         currentRealmID = id;
     }
 }

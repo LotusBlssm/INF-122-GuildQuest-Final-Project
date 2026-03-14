@@ -1,5 +1,11 @@
 package edu.uci.inf122.guildquest.content;
 
-public class Realm {
-    // placeholder for now
+import java.util.UUID;
+
+public interface Realm {
+    UUID getRealmID();
+    String getName();
+    String getDescription();
+    TimeRule getTimeRule();
+    Grid getGrid();
 }
