@@ -1,19 +1,20 @@
 package edu.uci.inf122.guildquest.entities.npcs;
 
-public abstract class NPC {
-    private String name;
-    private int health;
+import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Amount;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Damage;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Health;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
 
-    public NPC(String name, int health) {
+public abstract class NPC extends Entity {
+    protected Health health;
+
+    public NPC(Name name, Health health) {
         this.name = name;
         this.health = health;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getHealth() {
+    public Health getHealth() {
         return health;
     }
 
@@ -21,7 +22,7 @@ public abstract class NPC {
 
     public abstract void move();
 
-    public abstract void takeDamage(int damage);
+    public abstract void takeDamage(Damage damage);
 
-    public abstract void heal(int amount);
+    public abstract void heal(Amount amount);
 }

@@ -1,8 +1,10 @@
 package edu.uci.inf122.guildquest.entities;
 
+import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
+
 public abstract class Entity {
-    protected String name;
+    protected Name name;
 
     public abstract void act();
-    public String getName() {return name;}
+    public Name getName() {return name;}
 }
