@@ -7,14 +7,16 @@ public class BasicRealm implements Realm {
     private String name;
     private String description;
     private TimeRule timeRule;
-    private Grid grid;
+    private int gridWidth;
+    private int gridHeight;
 
-    public BasicRealm(UUID realmID, String name, String description, TimeRule timeRule, Grid grid) {
+    public BasicRealm(UUID realmID, String name, String description, TimeRule timeRule, int gridWidth, int gridHeight) {
         this.realmID = realmID;
         this.name = name;
         this.description = description;
         this.timeRule = timeRule;
-        this.grid = grid;
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
     }
 
     @Override
@@ -38,7 +40,12 @@ public class BasicRealm implements Realm {
     }
 
     @Override
-    public Grid getGrid() {
-        return grid;
+    public int getGridWidth() {
+        return gridWidth;
+    }
+
+    @Override
+    public int getGridHeight() {
+        return gridHeight;
     }
 }

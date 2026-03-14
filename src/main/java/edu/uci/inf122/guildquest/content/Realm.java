@@ -7,5 +7,6 @@ public interface Realm {
     String getName();
     String getDescription();
     TimeRule getTimeRule();
-    Grid getGrid();
+    int getGridWidth();
+    int getGridHeight();
 }
