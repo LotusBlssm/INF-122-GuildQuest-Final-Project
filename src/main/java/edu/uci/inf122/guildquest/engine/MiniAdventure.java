@@ -33,4 +33,8 @@ public abstract class MiniAdventure {
         this.players = players;
 
     }
+
+    public User getPlayer(int index) {
+        return players.get(index);
+    }
 }

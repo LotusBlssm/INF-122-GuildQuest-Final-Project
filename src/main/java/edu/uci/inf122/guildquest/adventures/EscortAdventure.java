@@ -1,5 +1,7 @@
 package edu.uci.inf122.guildquest.adventures;
 
+import edu.uci.inf122.guildquest.api.AdventureSnapshot;
+import edu.uci.inf122.guildquest.api.state.State;
 import edu.uci.inf122.guildquest.content.Realm;
 import edu.uci.inf122.guildquest.content.User;
 import java.util.ArrayList;
@@ -29,17 +31,33 @@ import edu.uci.inf122.guildquest.api.state.GridState;
 // maybe: depending on the weapon, the player can attack in different styles (ex: a bow can attack an enemy that is 2 spaces away, but a sword can only attack an enemy that is 1 space away).
 //
 // Treasures and items will be placed on the grid and can be picked up by the player if they are adjacent to them. (1 space away in any direction)
+//
+// OTHER-NPCs on Grid: 
+// there are other NPCs on the grid that can give the player some items or hints. 
+// the player enters the grid, then they interact with the NPCs.
+//
+// Win Condition: The player with the NPC reaches the destination. 
+// Lose Condition: The player with the NPC is on the same grid cell as an enemy.
+// 
+// Starting point should be the same for both players (maybe) 
+// The distance between Starting point and Destination must be at least 5 spaces away. 
+// 
+// Nice to have: 
+// - If the player with no NPC reaches the destination first, they will know the location of the destination.
 
-public class EscortAdventure { // extends MiniAdventure {
+public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     // private GridUI gridUI;
     // save/serialize
     private GridState gridState;
+    private int isNPCWithPlayer;
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
-    public EscortAdventure(List<Realm> realms, List<String> entities, List<WinCondition> winCondition) {
+    public EscortAdventure(List<Realm> realms, List<String> entities, List<WinCondition> winCondition,
+            List<User> players) {
         // super(realms, entities, winCondition, new ArrayList<>());
         // this.gridUI = new GridUI(10, 10);
+        super(realms, entities, winCondition, players);
         gridState = new GridState(12, 12) {
             @Override
             public void render() {
@@ -51,22 +69,30 @@ public class EscortAdventure { // extends MiniAdventure {
                 // logic to change the grid state based on game events
             }
         };
+        isNPCWithPlayer = 0; // default is player1 is with the NPC, but maybe we can ask.
     }
 
     public void play() {
         // game logic to run the adventure
         // initialize the grid, place entities (randomly), and start the game loop
-        boolean gameRunning = true;
         // pick a character and tools for the player, initialize the grid with entities,
         // etc.
-        while (gameRunning) {
+
+        initializeGrid();
+        initializeUser(); // set up who's with the NPC, etc.
+        while (true) {
             // render the grid state
             gridState.render();
             // accept player input
             acceptInput();
             // advance the game state
+            // in the case the game should end after accepting input
+            if (checkRunningCondition()) {
+                break;
+            }
             advanceCycle();
             // check win conditions and update gameRunning accordingly
+
         }
     }
 
@@ -78,11 +104,33 @@ public class EscortAdventure { // extends MiniAdventure {
         // advance the game state, move entities, check win conditions
     }
 
+    public AdventureSnapshot saveSnapshot() {
+        // logic to save the current state of the adventure
+        return null; // placeholder
+    }
+
     public void initializeGrid() {
         // logic to initialize the grid with entities, place the NPC to be escorted,
         // items, tresures, and enemies
 
-        //
+        // current default is: (12, 12).
+        // Starting point: (0, 0) with an NPC that needs to be escorted to the
+        // destination that
+    }
+
+    public void initializeUser() {
+        // logic to set up the user, which user is with the NPC, etc.
+        User player1 = getPlayer(0);
+        User player2 = getPlayer(1);
+
+        // default is player1 is with the NPC, but maybe we can ask. (so, )
+        // isNPCWithPlayer = 0;
+
+    }
+
+    public boolean checkRunningCondition() {
+        // check if the game should continue running (win/lose conditions)
+        return false; // placeholder
     }
 
 }
