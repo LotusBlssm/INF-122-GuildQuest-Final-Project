@@ -2,7 +2,7 @@ package edu.uci.inf122.guildquest.api.state;
 
 import java.util.List;
 
-public abstract class GridState implements State{
+public abstract class GridState implements State {
     private int length;
     private int width;
     private List<List<GridCell>> grid;
@@ -16,10 +16,25 @@ public abstract class GridState implements State{
     public List<List<GridCell>> getGrid() {
         return grid;
     }
+
     public int getLength() {
         return length;
     }
+
     public int getWidth() {
         return width;
+    }
+
+    public GridState(int length, int width) {
+        this.length = length;
+        this.width = width;
+        grid = new java.util.ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            List<GridCell> row = new java.util.ArrayList<>();
+            for (int j = 0; j < width; j++) {
+                row.add(new GridCell());
+            }
+            grid.add(row);
+        }
     }
 }

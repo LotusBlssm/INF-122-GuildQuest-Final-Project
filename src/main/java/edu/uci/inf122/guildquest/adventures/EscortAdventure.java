@@ -2,37 +2,52 @@ package edu.uci.inf122.guildquest.adventures;
 
 import edu.uci.inf122.guildquest.content.Realm;
 import edu.uci.inf122.guildquest.content.User;
-import edu.uci.inf122.guildquest.entities.Entity;
 import java.util.ArrayList;
 import java.util.List;
-import edu.uci.inf122.guildquest.adventures.WinCondition;
-import edu.uci.inf122.guildquest.ui.GridUI;
+import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
+// import edu.uci.inf122.guildquest.ui;
+import edu.uci.inf122.guildquest.engine.MiniAdventure;
+import edu.uci.inf122.guildquest.api.state.GridState;
 
-public class EscortAdventure {
-    private List<Realm> realms;
-    private List<Entity> entities;
-    private WinCondition winCondition;
-    private GridUI gridUI;
-    private List<User> players;
+// placeholder class for now
+public class EscortAdventure { // extends MiniAdventure {
+    // private GridUI gridUI;
     // save/serialize
+    private GridState gridState;
 
-    public EscortAdventure(List<Realm> realms, List<Entity> entities, WinCondition winCondition) implements SerializableAdventure {
-        this.realms = realms;
-        this.entities = entities;
-        this.winCondition = winCondition;
-        this.gridUI = new GridUI(10, 10); // Example grid size
-        this.players = new ArrayList<>(); // 2 players for escort adventure
-        /// this.save();
-        /// this.load(this.save());
+    public EscortAdventure(List<Realm> realms, List<String> entities, List<WinCondition> winCondition) {
+        // super(realms, entities, winCondition, new ArrayList<>());
+        // this.gridUI = new GridUI(10, 10);
+        gridState = new GridState(10, 10) {
+            @Override
+            public void render() {
+                // render the grid state to the UI
+            }
+
+            @Override
+            public void changeState() {
+                // logic to change the grid state based on game events
+            }
+        };
     }
 
     public void play() {
         // game logic to run the adventure
+        // initialize the grid, place entities (randomly), and start the game loop
+        boolean gameRunning = true;
+        while (gameRunning) {
+            // render the grid state
+            gridState.render();
+            // accept player input
+            acceptInput();
+            // advance the game state
+            advanceCycle();
+            // check win conditions and update gameRunning accordingly
+        }
     }
 
-    public boolean acceptInput() {
+    public void acceptInput() {
         // handle player input
-        return true; // placeholder
     }
 
     public void advanceCycle() {
