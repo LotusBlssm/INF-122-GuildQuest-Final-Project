@@ -1,8 +1,10 @@
 package edu.uci.inf122.guildquest.entities.nonlivings;
 
+import edu.uci.inf122.guildquest.content.Item;
+
 public class Chest extends Nonliving {
     private boolean isOpen;
-    private Item contents;
+    private final Item contents;
 
     public Chest(String name, String description, Item contents) {
         super(name, description);
@@ -14,17 +16,26 @@ public class Chest extends Nonliving {
         return isOpen;
     }
 
+    public Item getContents() {
+        return contents;
+    }
+
+    @Override
     public void act() {
-        if (!isOpen) {
-            isOpen = true;
-            giveItem();
-            System.out.println("You open the chest and find: " + contents);
-        } else {
+        if (isOpen) {
             System.out.println("The chest is already open.");
+            return;
         }
+        open();
+    }
+
+    protected void open() {
+        isOpen = true;
+        giveItem();
+        System.out.println("You open the chest and find: " + contents);
     }
 
     public void giveItem() {
-        // Logic to give the item to the player system
+        // TODO: Add item handoff to the player inventory system.
     }
 }

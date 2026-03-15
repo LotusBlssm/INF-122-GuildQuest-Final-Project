@@ -6,7 +6,7 @@ public class Ferryman extends NPC {
     private int fare;
 
     public Ferryman(String name, String destination, int fare) {
-        super(name);
+        super(name, 100);
         this.destination = destination;
         this.fare = fare;
     }
@@ -28,7 +28,13 @@ public class Ferryman extends NPC {
     }
 
     @Override
-    public void interact() {
-        System.out.println(name + " says: I can take you to " + destination + " for " + fare + " gold.");
+    public void act() {
+        System.out.println(getName() + " says: I can take you to " + destination + " for " + fare + " gold.");
+    }
+
+    @Override
+    public void move() {
+        System.out.println(getName() + " rows to " + destination + ".");
+        //TODO: Implement actual movement logic.
     }
 }
