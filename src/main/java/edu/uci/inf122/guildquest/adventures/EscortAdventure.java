@@ -49,7 +49,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     // private GridUI gridUI;
     // save/serialize
     private GridState gridState;
-    private int isNPCWithPlayer;
+    private int playerWithNPC;
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
@@ -69,7 +69,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 // logic to change the grid state based on game events
             }
         };
-        isNPCWithPlayer = 0; // default is player1 is with the NPC, but maybe we can ask.
+        playerWithNPC = 0; // default is player1 is with the NPC, but maybe we can ask.
     }
 
     public void play() {
@@ -98,6 +98,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
 
     public void acceptInput() {
         // handle player input: moving the player, attacking enemies
+
     }
 
     public void advanceCycle() {
@@ -116,6 +117,13 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // current default is: (12, 12).
         // Starting point: (0, 0) with an NPC that needs to be escorted to the
         // destination that
+
+        // two NPCs on grid
+        // 3 enemies on grid
+        // 3 items on grid
+        // they are all placed randomly, but the distance between the starting point and
+        // enemies should be at least 6 spaces away
+
     }
 
     public void initializeUser() {

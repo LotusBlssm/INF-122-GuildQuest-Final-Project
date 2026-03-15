@@ -54,16 +54,3 @@ public abstract class GridState implements State {
         return grid.get(row).get(col);
     }
 }
-    public GridState(int length, int width) {
-        this.length = length;
-        this.width = width;
-        grid = new java.util.ArrayList<>();
-        for (int i = 0; i < length; i++) {
-            List<GridCell> row = new java.util.ArrayList<>();
-            for (int j = 0; j < width; j++) {
-                row.add(new GridCell());
-            }
-            grid.add(row);
-        }
-    }
-}
