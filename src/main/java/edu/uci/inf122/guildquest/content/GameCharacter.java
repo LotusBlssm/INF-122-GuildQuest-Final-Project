@@ -26,4 +26,8 @@ public class GameCharacter extends GameContent {
     public void setName(String name) {
         characterName = name;
     }
+
+    public String getName() {
+        return characterName;
+    }
 }

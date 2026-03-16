@@ -81,4 +81,8 @@ public abstract class GridState implements State {
             }
         }
     }
+
+    public GridCell getCellContent(int row, int col) {
+        return getCell(row, col);
+    }
 }

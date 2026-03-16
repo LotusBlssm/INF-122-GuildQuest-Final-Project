@@ -53,6 +53,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     // save/serialize
     private GridState gridState;
     private int playerWithNPC;
+    private List<GameCharacter> playerCharacters; // TWO Charcters (Should be playable character entity later)
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
@@ -72,6 +73,15 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 // logic to change the grid state based on game events
             }
         };
+        UUID player1ID = players.get(0).getID();
+        UUID player2ID = players.get(1).getID();
+        GameCharacter player1_char = new GameCharacter("Player 1", "Warrior", 1, player1ID); // placeholder
+        GameCharacter player2_char = new GameCharacter("Player 2", "Mage", 1, player2ID); // placeholder
+
+        playerCharacters = new ArrayList<>();
+        playerCharacters.add(player1_char);
+        playerCharacters.add(player2_char);
+
         playerWithNPC = 0; // default is player1 is with the NPC, but maybe we can ask.
     }
 
@@ -106,6 +116,67 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // - attack
         // - move
         // - ask NPC for hints
+
+        // before the player choose the move (move or attack), the NPC with them can
+        // give them the fact if there ar enemies around them (2 spaces away in any
+        // direction).
+
+        if (player location is within 2 spaces of the destination) {
+            // give clear hints about the destination (ex: steps) 
+        } 
+        if (player location is closer to enemy) {
+            // let user know that they are close to an enemy. 
+        }
+        // if the enemy attacks the player, the player will know the enemy's location. 
+
+        // move logic: psuedocode for now
+        if (move) {
+            // logic to accept input for each player character
+
+            // moving logic: (take out later)
+            int moveRow = 4; // placeholder for player input
+            int moveCol = 4; // placeholder for player input
+            while (Math.abs(moveRow) + Math.abs(moveCol) > 3 || Math.abs(moveRow) + Math.abs(moveCol) == 0) {
+                // prompt player for valid input
+                // update moveRow and moveCol based on player input
+
+                // get move values from player input (for now, we will just use placeholders,
+                // but we will need to implement actual input handling later)
+                moveRow = 2;
+                moveCol = 1;
+                if (gridState.isValidPosition(moveRow, moveCol)) {
+                    // move the player character on the grid
+                    // for now, we will just set the new position of the player character on the
+                    // grid
+                    // but we will need to update the player's actual position in the game state
+                    // later
+                    gridState.setCell(moveRow, moveCol, character.getName());
+                } else {
+                    // prompt player for valid input
+                }
+            }
+            // check if the player with the NPC is on the same grid cell as an enemy, if so,
+            // end the game with a loss
+            // if there is an NPC or Items, then interact with them (ex: pick up items, get hints from NPCs, etc.)
+            // if player with no NPC is on the same grid cell as the destination, then the destination location is known.
+            // if the player with the NPC is on the same grid cell as the destination, then end the game with a win.
+            
+            // for (Entity content : gridState.getCellContent(moveRow,
+            // moveCol).getContent()) {
+            // if (content.contains("Enemy") && playerWithNPC ==
+            // playerCharacters.indexOf(character)) {
+            // // end the game with a loss
+            // System.out.println("Game Over! You were caught by an enemy.");
+            // System.exit(0);
+            // }
+            // }
+        }
+
+        // attack logic: psuedocode for now
+        if (attack) {
+
+        }
+
 
         // Enemies:
         // - move randomly

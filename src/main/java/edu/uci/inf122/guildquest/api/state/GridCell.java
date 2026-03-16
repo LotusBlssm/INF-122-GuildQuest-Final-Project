@@ -24,7 +24,7 @@ public class GridCell {
         return content != null;
     }
 
-    public List<Entity> getContent() {
+    public List<String> getContent() {
         return content;
     }
 
