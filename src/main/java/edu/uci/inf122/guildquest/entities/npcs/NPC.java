@@ -1,7 +1,8 @@
 package edu.uci.inf122.guildquest.entities.npcs;
 
-public abstract class NPC {
-    private String name;
+import edu.uci.inf122.guildquest.entities.Entity;
+
+public abstract class NPC extends Entity {
     private int health;
 
     public NPC(String name, int health) {
@@ -9,12 +10,12 @@ public abstract class NPC {
         this.health = health;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public int getHealth() {
         return health;
+    }
+
+    protected void setHealth(int health) {
+        this.health = Math.max(0, health);
     }
 
     public abstract void act();
@@ -22,6 +23,4 @@ public abstract class NPC {
     public abstract void move();
 
     public abstract void takeDamage(int damage);
-
-    public abstract void heal(int amount);
 }

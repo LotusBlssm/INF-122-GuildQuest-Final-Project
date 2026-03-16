@@ -1,9 +1,22 @@
 package edu.uci.inf122.guildquest.entities.nonlivings;
 
-public class Nonliving {
+import edu.uci.inf122.guildquest.entities.Entity;
 
+public class Nonliving extends Entity {
+    private final String description;
+
+    public Nonliving(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
     public void act() {
-        // Act method for nonliving entities
+        // Default no-op for static world objects.
     }
 
 }
