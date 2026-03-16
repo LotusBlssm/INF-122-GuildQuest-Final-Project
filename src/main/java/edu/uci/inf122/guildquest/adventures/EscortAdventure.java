@@ -79,10 +79,10 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     public EscortAdventure(List<Realm> realms, List<Entity> entities, List<WinCondition> winCondition,
                            List<User> players) {
         super(realms, entities, winCondition, players);
-        gridState = new TerminalGrid(12, 12);
+        gridState = new TerminalGrid(6, 6);
         // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
-        player1 = Assassin.getInstance(new Name(players.get(0).getName())); // placeholder
-        player2 = Cleric.getInstance(new Name(players.get(1).getName())); // placeholder
+//        player1 = Assassin.getInstance(new Name("assassin")); // placeholder
+//        player2 = Cleric.getInstance(new Name(players.get(1).getName())); // placeholder
     }
 
     public void play() {
@@ -91,11 +91,12 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // pick a character and tools for the player, initialize the grid with entities,
         // etc.
 
-        initializeGrid();
         initializeUser(); // set up who's with the NPC, etc. if we want to ask
+        initializeGrid();
         while (true) {
             // render the grid state
             gridState.render();
+
             // accept player input
             acceptInput();
             // advance the game state
@@ -105,6 +106,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             }
             advanceCycle();
             // check win conditions and update gameRunning accordingly
+            break;
 
         }
     }
@@ -269,7 +271,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // they are all placed randomly, but the distance between the starting point and
         // enemies should be at least 6 spaces away
         Princess princess_npc = new Princess(
-                new Name("bartholomew"), new Health(10), new Amount(2)
+                new Name("princess"), new Health(10), new Amount(2)
         );
 
         Goblin enemy1 = new Goblin(new Name("Goblin 1"), new Health(10), new Level(1));
@@ -283,7 +285,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         Item[] items = { item1, item2, item3 };
 
         NPC npc1 = new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10)); // placeholder for other NPC 1
-        NPC npc2 = new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far, far away")), new Amount(100)); // placeholder for other NPC 1
+        NPC npc2 = new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100)); // placeholder for other NPC 1
         NPC[] npcs = { npc1, npc2 };
 
         // randomly place the entities on the grid
@@ -310,13 +312,13 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 1 - Cleric
                 """, 1);
         if (p1Choice==1){
-            player1=Assassin.getInstance(new Name("Assassin")); // placeholder
-            player2=Cleric.getInstance(new Name("Cleric"));
+            player1=Cleric.getInstance(new Name("Player 1")); // placeholder
+            player2=Assassin.getInstance(new Name("Player 2"));
             page.print("Player 1 is the assassin, player 2 is the cleric\n");
         }
         else{
-            player2=Assassin.getInstance(new Name("Assassin")); // placeholder
-            player1=Cleric.getInstance(new Name("Cleric"));
+            player1=Assassin.getInstance(new Name("Assassin")); // placeholder
+            player2=Cleric.getInstance(new Name("Cleric"));
             page.print("Player 1 is the assassin, player 2 is the cleric\n");
         }
 

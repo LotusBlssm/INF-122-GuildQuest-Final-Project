@@ -8,7 +8,7 @@ import java.util.List;
 public abstract class GridState implements State {
     private int length;
     private int width;
-    private List<List<GridCell>> grid;
+    protected List<List<GridCell>> grid;
 
     // Added constructor to initialize the grid structure
     public GridState(int length, int width) {
