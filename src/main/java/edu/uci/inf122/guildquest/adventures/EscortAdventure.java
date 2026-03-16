@@ -12,10 +12,10 @@ import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
 import edu.uci.inf122.guildquest.api.state.GridState;
 import edu.uci.inf122.guildquest.entities.Entity;
-import edu.uci.inf122.guildquest.entities.PlayableCharacter;
-import edu.uci.inf122.guildquest.entities.Assassin;
-import edu.uci.inf122.guildquest.entities.Cleric;
-import edu.uci.inf122.guildquest.entities.Kinght;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
+import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
+import edu.uci.inf122.guildquest.entities.playablecharacters.Assassin;
+import edu.uci.inf122.guildquest.entities.playablecharacters.Cleric;
 import java.util.UUID;
 
 // The rule: 
@@ -31,14 +31,15 @@ import java.util.UUID;
 //
 // The maximum number of moves for each turn will be 3. (1, 2) or (2, 1) or (-2, 1), etc. 
 //
-// Enemies are able to attack the player if they are adjacent to the player with the NPC (1 space away in any direction). (NO MOVE)
+// Enemies are able to attack the player if they are adjacent to the player with the NPC (2 space away in any direction). (NO MOVE)
 // If the player who is with the NPC is at the same grid cell as an enemy, the player will lose and the adventure will end.
 // 
-// if the player wants to attack an enemy, the can only attack an enemy. that is adjacent to them (2 space away in any direction).
+// if the player wants to attack, they can only attack enemies (2 space away in any direction).
 // maybe: depending on the weapon, the player can attack in different styles (ex: a bow can attack an enemy that is 2 spaces away, but a sword can only attack an enemy that is 1 space away).
 //
-// Treasures and items will be placed on the grid and can be picked up by the player if they are adjacent to them. (1 space away in any direction)
-//
+// Chests and Keys will be placed on the grid and can be picked up by the player if they are adjacent to them. (1 space away in any direction)
+// Chests can be opened by any keys. (3 keys and 3 chests on the grid)
+// 
 // OTHER-NPCs on Grid: 
 // there are other NPCs on the grid that can give the player some items or hints. 
 // the player enters the grid, then they interact with the NPCs.
@@ -62,12 +63,10 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
-    public EscortAdventure(List<Realm> realms, List<String> entities, List<WinCondition> winCondition,
+    public EscortAdventure(List<Realm> realms, List<Entity> entities, List<WinCondition> winCondition,
             List<User> players) {
-        // super(realms, entities, winCondition, new ArrayList<>());
-        // this.gridUI = new GridUI(10, 10);
         super(realms, entities, winCondition, players);
-        gridState = new GridState(12, 12) {
+        gridState = new GridState(12, 12) { // (12, 12) as default grid size for now
             @Override
             public void render() {
                 // render the grid state to the UI
@@ -79,8 +78,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             }
         };
         // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
-        player1 = new Assasin(players.get(0).getName()); // placeholder
-        player2 = new Cleric(players.get(1).getName()); // placeholder
+        player1 = Assassin.getInstance(new Name(players.get(0).getName())); // placeholder
+        player2 = Cleric.getInstance(new Name(players.get(1).getName())); // placeholder
 
         playerWithNPC = 0; // default is player1 is with the NPC, but maybe we can ask.
     }
@@ -92,7 +91,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // etc.
 
         initializeGrid();
-        initializeUser(); // set up who's with the NPC, etc.
+        initializeUser(); // set up who's with the NPC, etc. if we want to ask
         while (true) {
             // render the grid state
             gridState.render();
@@ -121,80 +120,105 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // give them the fact if there ar enemies around them (2 spaces away in any
         // direction).
 
-        if (player location is within 2 spaces of the destination) {
-            // give clear hints about the destination (ex: steps) 
-        } 
-        if (player location is closer to enemy) {
-            // let user know that they are close to an enemy. 
-        }
-        // if the enemy attacks the player, the player will know the enemy's location. 
+        // if (player location is within 2 spaces of the destination) {
+        // // give clear hints about the destination (ex: steps)
+        // }
+        // if (player location is closer to enemy) {
+        // // let user know that they are close to an enemy.
+        // }
+        // // if the enemy attacks the player, the player will know the enemy's
+        // location.
 
-        // move logic: psuedocode for now
-        if (move) {
-            // logic to accept input for each player character
+        // // move logic: psuedocode for now
+        // if (move) {
+        // // logic to accept input for each player character
 
-            // moving logic: (take out later)
-            int moveRow = 4; // placeholder for player input
-            int moveCol = 4; // placeholder for player input
-            while (Math.abs(moveRow) + Math.abs(moveCol) > 3 || Math.abs(moveRow) + Math.abs(moveCol) == 0) {
-                // prompt player for valid input
-                // update moveRow and moveCol based on player input
+        // // moving logic: (take out later)
+        // int moveRow = 4; // placeholder for player input
+        // int moveCol = 4; // placeholder for player input
+        // while (Math.abs(moveRow) + Math.abs(moveCol) > 3 || Math.abs(moveRow) +
+        // Math.abs(moveCol) == 0) {
+        // // prompt player for valid input
+        // // update moveRow and moveCol based on player input
 
-                // get move values from player input (for now, we will just use placeholders,
-                // but we will need to implement actual input handling later)
-                moveRow = 2;
-                moveCol = 1;
-                if (gridState.isValidPosition(moveRow, moveCol)) {
-                    // move the player character on the grid
-                    // for now, we will just set the new position of the player character on the
-                    // grid
-                    // but we will need to update the player's actual position in the game state
-                    // later
-                    gridState.setCell(moveRow, moveCol, character.getName());
-                } else {
-                    // prompt player for valid input
-                }
-            }
-            // check if the player with the NPC is on the same grid cell as an enemy, if so,
-            // end the game with a loss
-            // if there is an NPC or Items, then interact with them (ex: pick up items, get hints from NPCs, etc.)
-            // if player with no NPC is on the same grid cell as the destination, then the destination location is known.
-            // if the player with the NPC is on the same grid cell as the destination, then end the game with a win.
+        // // get move values from player input (for now, we will just use placeholders,
+        // // but we will need to implement actual input handling later)
+        // moveRow = 2;
+        // moveCol = 1;
+        // if (gridState.isValidPosition(moveRow, moveCol)) {
+        // // move the player character on the grid
+        // // for now, we will just set the new position of the player character on the
+        // // grid
+        // // but we will need to update the player's actual position in the game state
+        // // later
+        // gridState.setCell(moveRow, moveCol, character.getName());
+        // } else {
+        // // prompt player for valid input
+        // }
+        // }
+        // check if the player with the NPC is on the same grid cell as an enemy, if so,
+        // end the game with a loss
+        // if there is an NPC or Items, then interact with them (ex: pick up items, get
+        // hints from NPCs, etc.)
+        // if player with no NPC is on the same grid cell as the destination, then the
+        // destination location is known.
+        // if the player with the NPC is on the same grid cell as the destination, then
+        // end the game with a win.
 
-            // for (Entity content : gridState.getCellContent(moveRow,
-            // moveCol).getContent()) {
-            // if (content.contains("Enemy") && playerWithNPC ==
-            // playerCharacters.indexOf(character)) {
-            // // end the game with a loss
-            // System.out.println("Game Over! You were caught by an enemy.");
-            // System.exit(0);
-            // }
-            // }
-        }
+        // for (Entity content : gridState.getCellContent(moveRow,
+        // moveCol).getContent()) {
+        // if (content.contains("Enemy") && playerWithNPC ==
+        // playerCharacters.indexOf(character)) {
+        // // end the game with a loss
+        // System.out.println("Game Over! You were caught by an enemy.");
+        // System.exit(0);
+        // }
+        // }
+        // }
 
         // attack logic: psuedocode for now
-        if (attack) {
-            // TODO: Identify which enemy the player wants to attack (only one enemy can be attacked per turn) 
-            // ask the player for the direction (since they don't know the enemy's location, they only know there is an enemy near them (within 2 spaces)) 
-            // if the user choice (direction) is correct, then the attack is successful and the enemies take damage 
-            // player can choose: up, down, left, right
-            // the attack is applied to all the enemies in that direction within 2 spaces 
+        // if (attack) {
+        // TODO: Identify which enemy the player wants to attack
+        // ask the player for the direction (since they don't know the enemy's location,
+        // they only know there is an enemy near them (within 2 spaces))
+        // if the user choice (direction) is correct, then the attack is successful and
+        // the enemies take damage
+        // player can choose: up, down, left, right
+        // the attack is applied to all the enemies in that direction within 2 spaces
 
-            // collect the enemies in the chosen direction within 2 spaces (don't include the non-enemy entities) 
-            for (enemy in enemies in that direction within 2 spaces) {
-                 player.attack(enemy); 
-                 if (enemy is defeated) {
-                    // remove the enemy from the grid
-                    // let the player know that they defeated an enemy. 
-                 }
-            }
-        }
-
+        // collect the enemies in the chosen direction within 2 spaces (don't include
+        // the non-enemy entities)
+        // for (enemy in enemies in that direction within 2 spaces) {
+        // player.attack(enemy);
+        // if (enemy is defeated) {
+        // // remove the enemy from the grid
+        // // let the player know that they defeated an enemy.
+        // }
+        // }
+        // }
 
         // Enemies:
         // - attack player if adjacent to player with NPC
-        // - if the player attacked them, the enemy can attack the player back during their turn
+        // - if the player attacked them, the enemy can attack the player back during
+        // their turn
 
+    }
+
+    // enemy turn logic: psuedocode for now
+    public void enemyTurn() {
+        // checks if each enemy is near the players (within 2 spaces)
+        // if so, the enemy will attack the players.
+        // The enemy can attack one player per turn
+        // but the priority is to attack the player with the NPC
+        // or the closest player.
+
+        // for (enemey in enemies) {
+        // if (enemy is within 2 spaces of player with NPC) {
+        // enemy.attack(player with NPC);
+        // } else if (enemy is within 2 spaces of the other player) {
+        // enemy.attack(the other player);
+        // }
+        // }
     }
 
     public void advanceCycle() {

@@ -5,13 +5,13 @@ import edu.uci.inf122.guildquest.api.state.State;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 import edu.uci.inf122.guildquest.content.Realm;
 import edu.uci.inf122.guildquest.content.User;
-// import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.Entity;
 
 import java.util.List;
 
 public abstract class MiniAdventure {
     private List<Realm> realms;
-    private List<String> entities; // placeholder for now - will be replaced with actual Entity objects
+    private List<Entity> entities; // placeholder for now - will be replaced with actual Entity objects
     private List<WinCondition> winCondition;
     private List<User> players;
     private State state;
@@ -25,7 +25,7 @@ public abstract class MiniAdventure {
 
     public abstract AdventureSnapshot saveSnapshot();
 
-    public MiniAdventure(List<Realm> realms, List<String> entities, List<WinCondition> winCondition,
+    public MiniAdventure(List<Realm> realms, List<Entity> entities, List<WinCondition> winCondition,
             List<User> players) {
         this.realms = realms;
         this.entities = entities;
