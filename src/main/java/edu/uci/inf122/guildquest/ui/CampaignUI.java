@@ -2,8 +2,7 @@ package edu.uci.inf122.guildquest.ui;
 
 import edu.uci.inf122.guildquest.content.Campaign;
 import edu.uci.inf122.guildquest.content.QuestEvent;
-
-// import VisibilityAndSharing.VisibilityType;
+import edu.uci.inf122.guildquest.content.VisibilityType;
 
 import java.util.List;
 
