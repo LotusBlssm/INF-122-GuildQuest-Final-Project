@@ -1,10 +1,11 @@
 package edu.uci.inf122.guildquest.ui;
 
-// import RealmAndTime.WorldTime;
+import edu.uci.inf122.guildquest.content.WorldTime;
 
 public class WorldTimeUI {
     static private final Page page = Page.getPage();
-    public static WorldTime createTime(){
+
+    public static WorldTime createTime() {
         page.print("Setting Start Time:\n");
         int mins = page.acceptIntUntil("Please choose number of minutes:", 59);
         int hours = page.acceptIntUntil("Please choose number of hours:", 23);

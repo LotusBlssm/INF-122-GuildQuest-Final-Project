@@ -8,7 +8,7 @@ public class GameCharacter extends GameContent {
     private String characterClass;
     private int characterLevel;
     private UUID userID;
-    // private Inventory inventory;
+    private Inventory inventory;
 
     // constructor:
     public GameCharacter(String charName, String charClass, int charLevel, UUID userID) {
@@ -16,6 +16,11 @@ public class GameCharacter extends GameContent {
         characterClass = charClass;
         characterLevel = charLevel;
         this.userID = userID;
+        this.inventory = new Inventory();
+    }
+
+    public GameCharacter(String charName, String charClass) {
+        this(charName, charClass, 1, null);
     }
 
     // check name
@@ -23,11 +28,27 @@ public class GameCharacter extends GameContent {
         return name.equals(characterName);
     }
 
+    public String getName() {
+        return characterName;
+    }
+
     public void setName(String name) {
         characterName = name;
     }
 
-    public String getName() {
-        return characterName;
+    public String getCharacterClass() {
+        return characterClass;
+    }
+
+    public int getCharacterLevel() {
+        return characterLevel;
+    }
+
+    public UUID getUserID() {
+        return userID;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
     }
 }
