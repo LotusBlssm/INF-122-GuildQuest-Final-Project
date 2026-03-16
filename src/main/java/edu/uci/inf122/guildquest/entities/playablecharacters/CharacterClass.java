@@ -7,4 +7,7 @@ public class CharacterClass {
     public CharacterClass(Name name){
         this.name=name;
     }
+    public CharacterClass(String name){
+        this.name = new Name(name);
+    }
 }

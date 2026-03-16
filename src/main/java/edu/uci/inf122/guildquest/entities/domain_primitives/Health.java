@@ -45,8 +45,8 @@ public class Health {
      * @param damage the damage
      */
     public void reduceBy(Damage damage) {
-        if (damage.getDamage()> health) health = 0;
-        else health -= damage.getDamage();
+        if (damage.getDamage().getCount()> health) health = 0;
+        else health -= damage.getDamage().getCount();
     }
 
     /**
@@ -57,6 +57,10 @@ public class Health {
     public void increaseBy(Amount amount) {
         if (health + amount.getCount() >= capacity) health = capacity;
         else health+=amount.getCount();
+    }
+    public void increaseBy(DecimalAmount amount) {
+        if (health + amount.getCount() >= capacity) health = capacity;
+        else health = (int) Math.floor(amount.getCount()+health);
     }
 
     public int getHealth() {

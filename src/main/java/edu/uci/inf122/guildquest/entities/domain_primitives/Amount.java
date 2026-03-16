@@ -12,4 +12,20 @@ public class Amount {
     public int getCount() {
         return count;
     }
+
+
+    /**
+     * Returns a NEW amount multiplied. Does not modify this amount;
+     * @param i amount to multiply by
+     */
+    public Amount multiply(int i) {
+            return new Amount(count*i);
+    }
+    /**
+     * Returns a NEW amount multiplied. Does not modify this amount;
+     * @param i amount to multiply by
+     */
+    public DecimalAmount multiply(double i) {
+        return new DecimalAmount(count*i);
+    }
 }
