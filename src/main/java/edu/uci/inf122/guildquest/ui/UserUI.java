@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
  */
 public class UserUI {
     private enum OptionEnum{
-        Exit(0), AdventureMan(1), CampaignMan(2), CharMan(3); // Add save data to a json file
+        Exit(0), CreateC(1), EditC(2), ViewC(3), CharMan(4), Settings(5);
         OptionEnum(int i) {
         }
         static OptionEnum get(int i) {
@@ -117,7 +117,7 @@ public class UserUI {
         return null;
     }
 
-    private static void openSettings() {
+    private static  void openSettings() {
         page.print("unimplemented\n");
     }
     /**
@@ -156,9 +156,13 @@ public class UserUI {
     public static void displayOptions(User user){
         String prompt = "Welcome, " + user.getUsername() + "!\n";
         prompt +=  """
-                    1 --- Play Adventure
-                    2 --- Campaign Manager
-                    3 --- Character Manager
+                    1 --- Create Campaign
+                    2 --- Edit Campaign(s)
+                    3 --- View Campaign(s)
+                    
+                    4 --- Character Manager
+                    
+                    5 --- Settings (unimplemented)
                     
                     0 --- exit
                     """;
@@ -167,8 +171,9 @@ public class UserUI {
             i = page.acceptIntUntil(prompt,5);
             OptionEnum choice = OptionEnum.get(i);
             switch (choice) {
-                case AdventureMan -> playAdventure(user);
-                case CampaignMan -> campaignManager(user);
+                case CreateC -> createCampaign(user);
+                case EditC -> editCampaign(user);
+                case ViewC -> viewCampaign(user);
                 case CharMan -> characterManager(user);
                 case Settings -> openSettings();
                 case Exit -> System.out.print("");

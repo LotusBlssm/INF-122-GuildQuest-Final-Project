@@ -1,40 +1,54 @@
 package edu.uci.inf122.guildquest.entities.npcs;
 
-public class Ferryman extends NPC {
-    // Note: The destination and fare are currently placeholders. 
-    private String destination;
-    private int fare;
+import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 
-    public Ferryman(String name, String destination, int fare) {
-        super(name, 100);
+import static edu.uci.inf122.guildquest.ui.UserUI.page;
+
+public class Ferryman extends NPC {
+    // Note: The destination and fare are currently placeholders.
+    private Place destination;
+    private Amount fare;
+
+
+    public Ferryman(Name name, Place destination, Amount fare) {
+        super(name, Health.createDefault());
         this.destination = destination;
         this.fare = fare;
     }
 
-    public String getDestination() {
+    public Place getDestination() {
         return destination;
     }
 
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-
-    public int getFare() {
+    public Amount getFare() {
         return fare;
     }
 
-    public void setFare(int fare) {
-        this.fare = fare;
+    public void interact() {
+        page.print(name + " says: I can take you to " + destination + " for " + fare + " gold.");
     }
 
     @Override
     public void act() {
-        System.out.println(getName() + " says: I can take you to " + destination + " for " + fare + " gold.");
+        interact();
     }
 
     @Override
     public void move() {
         System.out.println(getName() + " rows to " + destination + ".");
         //TODO: Implement actual movement logic.
+    }
+
+    @Override
+    public void takeDamage(Damage damage) {
+        health.reduceBy(damage);
+        if (isDead()){
+            System.out.println(name + "died!");
+        }
+    }
+
+    @Override
+    public void heal(Amount amount) {
+        health.increaseBy(amount);
     }
 }

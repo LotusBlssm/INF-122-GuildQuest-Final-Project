@@ -1,16 +1,20 @@
 package edu.uci.inf122.guildquest.entities.nonlivings;
 
 import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
+
+import java.util.UUID;
 
 public class Nonliving extends Entity {
-    private final String description;
+    private final Text description;
+    private final UUID id;
 
-    public Nonliving(String name, String description) {
-        this.name = name;
+    public Nonliving(Text description) {
+        id = UUID.randomUUID();
         this.description = description;
     }
 
-    public String getDescription() {
+    public Text getDescription() {
         return description;
     }
 

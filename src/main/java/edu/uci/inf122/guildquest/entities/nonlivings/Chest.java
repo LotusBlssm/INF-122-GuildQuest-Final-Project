@@ -1,19 +1,20 @@
 package edu.uci.inf122.guildquest.entities.nonlivings;
 
 import edu.uci.inf122.guildquest.content.Item;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
 
 public class Chest extends Nonliving {
-    private boolean isOpen;
-    private final Item contents;
+    protected ChestStatus status;
+    private Item contents;
 
-    public Chest(String name, String description, Item contents) {
-        super(name, description);
+    public Chest(Item contents, Text description) {
+        super(description);
         this.contents = contents;
-        this.isOpen = false;
+        this.status = new ChestStatus(ChestStatus.Status.CLOSED);
     }
 
     public boolean isOpen() {
-        return isOpen;
+        return status.isOpen();
     }
 
     public Item getContents() {
@@ -22,20 +23,51 @@ public class Chest extends Nonliving {
 
     @Override
     public void act() {
-        if (isOpen) {
-            System.out.println("The chest is already open.");
-            return;
-        }
         open();
     }
 
-    protected void open() {
-        isOpen = true;
-        giveItem();
-        System.out.println("You open the chest and find: " + contents);
+    /**
+     * Attempt to open the chest. Does not grab the item.
+     *
+     */
+    public void open(){
+        if (status.isLooted()){
+            System.out.println("The chest is already open and looted.");
+        }
+        else if (status.isOpen()){
+            System.out.println("You open the chest and see: " + contents);
+        }
+        else if (status.isClosed()) {
+            status = new ChestStatus(ChestStatus.Status.OPEN);
+            System.out.println("You open the chest and see: " + contents);
+        }
     }
 
-    public void giveItem() {
-        // TODO: Add item handoff to the player inventory system.
+    /**
+     * attempt to take from the chest
+     *
+     * @param c the character
+     */
+    public void take(Character c){
+        if (status.isClosed()){
+            System.out.println("Closed, please open first");
+        }
+        else if (status.isOpen()){
+            System.out.println("You take: " + contents.getName());
+            giveItem(c);
+        }
+        else if (status.isLooted()){
+            System.out.println("There is nothing to take in this chest.");
+        }
+    }
+
+    /**
+     * Logic to give the item to the player system
+     *
+     * @param c the character to receive the contents
+     */
+    public void giveItem(Character c) {
+        // c.acceptItem(contents);
+        contents = null;
     }
 }

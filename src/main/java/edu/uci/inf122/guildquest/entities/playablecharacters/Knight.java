@@ -1,23 +1,24 @@
 package edu.uci.inf122.guildquest.entities.playablecharacters;
 
 import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.interfaces.CanAttack;
 
 public class Knight extends PlayableCharacter implements CanAttack {
     private static Knight instance;
 
-    private final double damageReductionMultiplier;
-    private final double healingMultiplier;
-    private final int attackPower;
+    private final DecimalAmount damageReductionMultiplier;
+    private final DecimalAmount healingMultiplier;
+    private final Amount attackPower;
 
-    private Knight(String name) {
-        super(name, 100, 1, "Knight");
-        this.damageReductionMultiplier = 0.85;
-        this.healingMultiplier = 1.15;
-        this.attackPower = 15;
+    private Knight(Name name) {
+        super(name, new Health(100), new Level(1), new CharacterClass("Knight"));
+        this.damageReductionMultiplier = new DecimalAmount(0.85);
+        this.healingMultiplier = new DecimalAmount(1.15);
+        this.attackPower = new Amount(15);
     }
 
-    public static Knight getInstance(String name) {
+    public static Knight getInstance(Name name) {
         if (instance == null) {
             instance = new Knight(name);
         }
@@ -35,21 +36,21 @@ public class Knight extends PlayableCharacter implements CanAttack {
     }
 
     @Override
-    public void receiveHealing(int amount) {
-        int increasedHealing = (int) (Math.max(0, amount) * healingMultiplier);
-        setHealth(getHealth() + increasedHealing);
-        System.out.println(getName() + " receives " + increasedHealing + " healing. Current health: " + getHealth());
+    public void receiveHealing(Amount amount) {
+        DecimalAmount modifiedAmount = amount.multiply(healingMultiplier.getCount());
+        heal(modifiedAmount);
+        System.out.println(getName() + " receives " + modifiedAmount + " healing. Current health: " + getHealth());
     }
 
     @Override
-    public void takeDamage(int damage) {
-        int reducedDamage = (int) (Math.max(0, damage) * damageReductionMultiplier);
-        setHealth(getHealth() - reducedDamage);
+    public void takeDamage(Damage damage) {
+        Damage reducedDamage = damage.multiply(damageReductionMultiplier);
+        getHealth().reduceBy(reducedDamage);
         System.out.println(getName() + " takes " + reducedDamage + " damage. Remaining health: " + getHealth());
     }
 
     @Override
     public void attack(Entity target) {
-        dealDamage(target, attackPower);
+        dealDamage(target, new Damage(attackPower));
     }
 }

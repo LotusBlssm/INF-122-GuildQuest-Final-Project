@@ -227,26 +227,4 @@ public class CampaignUI {
                 QuestEventUI.timelineString(c));
         page.print(display);
     }
-
-        public static void displayOptions(User user){
-        String prompt = """
-                What would you like to do to the campaigns?
-                1 --- Create
-                2 --- Edit
-                3 --- View
-                
-                0 --- exit
-                """;
-        int choice = -1;
-        while (choice != 0){
-            choice = page.acceptIntUntil(prompt, 3);
-            page.nextScreen();
-            switch (choice){
-                case 0 -> page.print("leaving\n");
-                case 1 -> createCharacter(user);
-                case 2 -> editCharacter(user);
-                case 3 -> removeCharacter(user);
-            }
-        }
-    }
 }

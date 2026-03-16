@@ -1,20 +1,21 @@
 package edu.uci.inf122.guildquest.entities.npcs;
 
 import edu.uci.inf122.guildquest.entities.Entity;
-import edu.uci.inf122.guildquest.entities.interfaces.CanAttack;
+import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 
-public class Goblin extends NPC implements isHostile, CanAttack {
-    private int attackPower = 15; // Default attack power, can be overridden by subclasses
+import static edu.uci.inf122.guildquest.ui.UserUI.page;
 
-    public Goblin(String name, int health) {
+public class Goblin extends NPC implements Hostile {
+    private Level level;
+    public Goblin(Name name, Health health, Level level) {
         super(name, health);
+        this.level = level;
     }
-
 
     @Override
     public void act() {
-        // TODO: Implement goblin behavior logic.
+
     }
 
     @Override
@@ -24,7 +25,7 @@ public class Goblin extends NPC implements isHostile, CanAttack {
 
     @Override
     public void attack(Entity target) {
-        int damage = Math.max(1, attackPower);
+        Damage damage = new Damage(Math.max(1, attackPower));
 
         if (target instanceof PlayableCharacter playableTarget) {
             playableTarget.takeDamage(damage);
@@ -40,13 +41,23 @@ public class Goblin extends NPC implements isHostile, CanAttack {
     }
 
     @Override
-    public void takeDamage(int damage) {
-        setHealth(getHealth() - damage);
+    public boolean isAggressive() {
+        return true;
+    }
+
+    @Override
+    public void takeDamage(Damage damage) {
+        getHealth().reduceBy(damage);
         System.out.println(getName() + " takes " + damage + " damage. Health: " + getHealth());
     }
 
     @Override
+    public void heal(Amount amount) {
+        getHealth().increaseBy(amount);
+    }
+
+    @Override
     public void warCry() {
-        System.out.println(getName() + " screeches menacingly!");
+        page.print("GARBLE GARBLE");
     }
 }
