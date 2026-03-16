@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class GridCell {
     // placeholder for now : Must be able to hold an Entity (player character, NPC,
     // enemy, etc.) or be empty
-    private List<String> content;
+    private List<Entity> content;
 
     // Added constructor so every cell starts empty
     public GridCell() {
@@ -23,11 +23,11 @@ public class GridCell {
         return content != null;
     }
 
-    public List<String> getContent() {
+    public List<Entity> getContent() {
         return content;
     }
 
-    public void setContent(String newEntity) {
+    public void setContent(Entity newEntity) {
         content = new ArrayList<>();
         content.add(newEntity);
     }

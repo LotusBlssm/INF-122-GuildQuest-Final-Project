@@ -8,13 +8,17 @@ import java.util.List;
 public class TerminalGrid extends GridState {
     private GridState grid;
     private Page out;
+    public TerminalGrid(int l, int w){
+        super(l, w);
+        out = Page.getPage();
+    }
 
     @Override
     public void render() {
         int longestNameLen=0;
         for (List<GridCell> row : grid.getGrid()){
             for (GridCell cell : row){
-                longestNameLen = Math.max(cell.getContent().getName().length(), longestNameLen);
+                longestNameLen = Math.max(cell.getContent().getLast().getName().length(), longestNameLen);
             }
         }
 
@@ -23,10 +27,10 @@ public class TerminalGrid extends GridState {
         int padding;
         for (List<GridCell> row : grid.getGrid()){
             for (GridCell cell : row){
-                padding = longestNameLen - cell.getContent().getName().length();
+                padding = longestNameLen - cell.getContent().getLast().getName().length();
                 leftPad = padding / 2;
                 rightPad = padding - leftPad;
-                out.print("| "+" ".repeat(leftPad)+cell.getContent().getName()+" ".repeat(rightPad)+" |");
+                out.print("| "+" ".repeat(leftPad)+cell.getContent().getLast()+" ".repeat(rightPad)+" |");
             }
             out.print('\n');
         }

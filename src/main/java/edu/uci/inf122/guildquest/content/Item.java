@@ -1,14 +1,16 @@
 package edu.uci.inf122.guildquest.content;
 
+import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
+
 import java.util.UUID;
 
-public abstract class Item {
+public abstract class Item extends Entity {
     private UUID itemID;
-    private String name;
     private int rarity;
     private String description;
 
-    public Item(UUID itemID, String name, int rarity, String description) {
+    public Item(UUID itemID, Name name, int rarity, String description) {
         this.itemID = itemID;
         this.name = name;
         this.rarity = rarity;
@@ -17,10 +19,6 @@ public abstract class Item {
 
     public UUID getItemID() {
         return itemID;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public int getRarity() {

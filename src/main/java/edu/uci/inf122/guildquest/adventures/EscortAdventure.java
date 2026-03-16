@@ -2,9 +2,10 @@ package edu.uci.inf122.guildquest.adventures;
 
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
 import edu.uci.inf122.guildquest.api.state.State;
-import edu.uci.inf122.guildquest.content.Realm;
-import edu.uci.inf122.guildquest.content.GameCharacter;
-import edu.uci.inf122.guildquest.content.User;
+import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
+import edu.uci.inf122.guildquest.content.*;
+
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
@@ -12,10 +13,14 @@ import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
 import edu.uci.inf122.guildquest.api.state.GridState;
 import edu.uci.inf122.guildquest.entities.Entity;
-import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
-import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
+import edu.uci.inf122.guildquest.entities.domain_primitives.*;
+import edu.uci.inf122.guildquest.entities.npcs.*;
 import edu.uci.inf122.guildquest.entities.playablecharacters.Assassin;
 import edu.uci.inf122.guildquest.entities.playablecharacters.Cleric;
+import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
+import edu.uci.inf122.guildquest.ui.Page;
+import edu.uci.inf122.guildquest.ui.TerminalGrid;
+
 import java.util.UUID;
 
 // The rule: 
@@ -64,32 +69,20 @@ import java.util.UUID;
 public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     // private GridUI gridUI;
     // save/serialize
-    private GridState gridState;
-    private int playerWithNPC;
+    private final TerminalGrid gridState;
     private PlayableCharacter player1;
     private PlayableCharacter player2;
+    private final static Page page = Page.getPage();
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
     public EscortAdventure(List<Realm> realms, List<Entity> entities, List<WinCondition> winCondition,
-            List<User> players) {
+                           List<User> players) {
         super(realms, entities, winCondition, players);
-        gridState = new GridState(12, 12) { // (12, 12) as default grid size for now
-            @Override
-            public void render() {
-                // render the grid state to the UI
-            }
-
-            @Override
-            public void changeState() {
-                // logic to change the grid state based on game events
-            }
-        };
+        gridState = new TerminalGrid(12, 12);
         // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
         player1 = Assassin.getInstance(new Name(players.get(0).getName())); // placeholder
         player2 = Cleric.getInstance(new Name(players.get(1).getName())); // placeholder
-
-        playerWithNPC = 0; // default is player1 is with the NPC, but maybe we can ask.
     }
 
     public void play() {
@@ -272,45 +265,36 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // two NPCs on grid
         // 3 enemies on grid
         // 3 items on grid
+
         // they are all placed randomly, but the distance between the starting point and
         // enemies should be at least 6 spaces away
+        Princess princess_npc = new Princess(
+                new Name("bartholomew"), new Health(10), new Amount(2)
+        );
 
-        // for now, we will just use String for the entities, but we will replace it
-        // with actual Entity objects later.
-        String princess_npc = "Princess NPC"; // placeholder for the NPC that needs to be escorted
-        UUID user1 = UUID.randomUUID(); // placeholder for the destination that the NPC knows
-        UUID user2 = UUID.randomUUID();
-        // need to replace with actual playable characters later
-        GameCharacter player1_char = new GameCharacter("Player 1", "Warrior", 1, user1); // placeholder for player 1's
-        GameCharacter player2_char = new GameCharacter("Player 2", "Mage", 1, user2); // placeholder for player 2's
-        // character
+        Goblin enemy1 = new Goblin(new Name("Goblin 1"), new Health(10), new Level(1));
+        Goblin enemy2 = new Goblin(new Name("Goblin 2"), new Health(12), new Level(1));
+        Goblin enemy3 = new Goblin(new Name("Goblin 3"), new Health(15), new Level(2));
+        Goblin[] enemies = { enemy1, enemy2, enemy3 };
 
-        String enemy1 = "Goblin Enemy1"; // placeholder for enemy 1
-        String enemy2 = "Goblin Enemy2"; // placeholder for enemy 2
-        String enemy3 = "Goblin Enemy3"; // placeholder for enemy 3
-        String[] enemies = { enemy1, enemy2, enemy3 };
+        Item item1 = ItemFactory.createWeapon("blue sword", 1, "a blue sword", 6);
+        Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
+        Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
+        Item[] items = { item1, item2, item3 };
 
-        String item1 = "Item1"; // placeholder for item 1
-        String item2 = "Item2"; // placeholder for item 2
-        String item3 = "Item3"; // placeholder for item 3
-        String[] items = { item1, item2, item3 };
-
-        String npc1 = "NPC1"; // placeholder for other NPC 1
-        String npc2 = "NPC2"; // placeholder for other NPC 2
-        String[] npcs = { npc1, npc2 };
-
-        String destination = "Destination";
+        NPC npc1 = new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10)); // placeholder for other NPC 1
+        NPC npc2 = new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far, far away")), new Amount(100)); // placeholder for other NPC 1
+        NPC[] npcs = { npc1, npc2 };
 
         // randomly place the entities on the grid
         // princess, player1, and player2 are placed at the same starting point.
         gridState.setCell(0, 0, princess_npc);
-        gridState.setCell(0, 0, "Player 1");
-        gridState.setCell(0, 0, "Player 2");
+        gridState.setCell(0, 1, player1);
+        gridState.setCell(0, 2, player2);
 
         gridState.initializeGrid(enemies);
         gridState.initializeGrid(items);
         gridState.initializeGrid(npcs);
-
     }
 
     void initializePlayerCharacter() {
@@ -319,8 +303,22 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
 
     public void initializeUser() {
         // logic to set up the user, which user is with the NPC, etc.
-        // default is player1 is with the NPC, but maybe we can ask. (so, )
-        // isNPCWithPlayer = 0;
+        // ask UI which characters they would like to be.
+        int p1Choice = page.acceptIntUntil("""
+                Player 1, would you like to be an Assassin, or a Cleric?
+                0 - Assassin
+                1 - Cleric
+                """, 1);
+        if (p1Choice==1){
+            player1=Assassin.getInstance(new Name("Assassin")); // placeholder
+            player2=Cleric.getInstance(new Name("Cleric"));
+            page.print("Player 1 is the assassin, player 2 is the cleric\n");
+        }
+        else{
+            player2=Assassin.getInstance(new Name("Assassin")); // placeholder
+            player1=Cleric.getInstance(new Name("Cleric"));
+            page.print("Player 1 is the assassin, player 2 is the cleric\n");
+        }
 
     }
 
@@ -340,6 +338,17 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     public boolean checkRunningCondition() {
         // check if the game should continue running (win/lose conditions)
         return false; // placeholder
+    }
+    public static void main(String[] args){
+        List<WinCondition> winConditions = new ArrayList<>();
+        winConditions.add(new TimeLimitCondition(new Time(2)));
+        EscortAdventure adventure = new EscortAdventure(
+                null,
+                null,
+                winConditions,
+                null);
+
+        adventure.play();
     }
 
 }

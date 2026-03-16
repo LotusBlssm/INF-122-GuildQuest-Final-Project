@@ -46,12 +46,6 @@ public class Goblin extends NPC implements Hostile {
     }
 
     @Override
-    public void takeDamage(Damage damage) {
-        getHealth().reduceBy(damage);
-        System.out.println(getName() + " takes " + damage + " damage. Health: " + getHealth());
-    }
-
-    @Override
     public void heal(Amount amount) {
         getHealth().increaseBy(amount);
     }

@@ -32,4 +32,8 @@ public class Name {
     public String toString() {
         return name;
     }
+
+    public int length() {
+        return name.length();
+    }
 }

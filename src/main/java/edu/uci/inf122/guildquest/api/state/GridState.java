@@ -1,5 +1,7 @@
 package edu.uci.inf122.guildquest.api.state;
 
+import edu.uci.inf122.guildquest.entities.Entity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,18 +57,18 @@ public abstract class GridState implements State {
     }
 
     // Helper method to get a specific cell
-    public void setCell(int row, int col, String name) {
+    public void setCell(int row, int col, Entity e) {
         if (!isValidPosition(row, col)) {
             throw new IllegalArgumentException("Invalid grid position: (" + row + ", " + col + ")");
         }
-        grid.get(row).get(col).setContent(name);
+        grid.get(row).get(col).setContent(e);
     }
 
     public int getDistance(int row1, int col1, int row2, int col2) {
         return Math.abs(row1 - row2) + Math.abs(col1 - col2);
     }
 
-    public void initializeGrid(String[] entities) {
+    public void initializeGrid(Entity[] entities) {
         // logic to initialize the grid with the entities in the adventure
         // for now, we will just randomly place the entities on the grid, but we can
         // make it more complex later (e.g. certain entities can only be placed in

@@ -22,7 +22,13 @@ public abstract class NPC extends Entity {
 
     public abstract void move();
 
-    public abstract void takeDamage(Damage damage);
+    public void takeDamage(Damage damage){
+        health.reduceBy(damage);
+        if (isDead()){
+            System.out.println(name + "died!");
+        } else
+            System.out.println(getName() + " takes " + damage + " damage. Health: " + getHealth());
+    }
 
     public abstract void heal(Amount amount);
 
