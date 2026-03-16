@@ -27,15 +27,23 @@ import java.util.UUID;
 //
 // EX) player1 can move up 2 spaces, then right 1 space. (2, 1)
 // EX) player2 can move down 3 spaces. (-3, 0)
-// EX) player1 can move left 2 spaces. (0, -2)
+// EX) player1 can move left 2 spaces. (0, -2) 
+//
+// The initial information the players have: 
+// - current grid state for players 
+//
+// more information for later: 
+// - if the player succeed in attacking an enemy, they will know the enemy's location. 
+// - if the player with no NPC reaches the destination first, they will know the location of the destination. 
+// - if the player with the NPC is within 2 spaces of the destination, they will get clear hints about the destination (ex: steps).
+//
 //
 // The maximum number of moves for each turn will be 3. (1, 2) or (2, 1) or (-2, 1), etc. 
 //
 // Enemies are able to attack the player if they are adjacent to the player with the NPC (2 space away in any direction). (NO MOVE)
 // If the player who is with the NPC is at the same grid cell as an enemy, the player will lose and the adventure will end.
 // 
-// if the player wants to attack, they can only attack enemies (2 space away in any direction).
-// maybe: depending on the weapon, the player can attack in different styles (ex: a bow can attack an enemy that is 2 spaces away, but a sword can only attack an enemy that is 1 space away).
+// if the player wants to attack, they can only attack enemies (No ohter npcs) (2 space away in any direction).]
 //
 // Chests and Keys will be placed on the grid and can be picked up by the player if they are adjacent to them. (1 space away in any direction)
 // Chests can be opened by any keys. (3 keys and 3 chests on the grid)
@@ -120,6 +128,30 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // give them the fact if there ar enemies around them (2 spaces away in any
         // direction).
 
+        boolean answered = false;
+        while (!answered) {
+            int choice = 1; // placeholder for player input
+            switch (choice) {
+                case 1 -> {
+                    // move logic
+                    makeMove();
+                    answered = true;
+                }
+                case 2 -> {
+                    // attack logic
+                    makeAttack();
+                    answered = true;
+                }
+                case 3 -> {
+                    // ask for hints
+                    makeHintRequest();
+                    answered = true;
+                }
+                default -> {
+                    // prompt player for valid input
+                }
+            }
+        }
         // if (player location is within 2 spaces of the destination) {
         // // give clear hints about the destination (ex: steps)
         // }
@@ -290,6 +322,19 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // default is player1 is with the NPC, but maybe we can ask. (so, )
         // isNPCWithPlayer = 0;
 
+    }
+
+    // player action logic: move, attack, ask for hints
+    public void makeMove() {
+        // logic to let the player make move choices
+    }
+
+    public void makeAttack() {
+        // logic to let the player make attack choices
+    }
+
+    public void makeHintRequest() {
+        // logic to let the player ask for hints
     }
 
     public boolean checkRunningCondition() {
