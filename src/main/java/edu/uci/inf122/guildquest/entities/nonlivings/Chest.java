@@ -1,31 +1,27 @@
 package edu.uci.inf122.guildquest.entities.nonlivings;
 
 import edu.uci.inf122.guildquest.content.Item;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
 
 public class Chest extends Nonliving {
-    private class OpenStatus{
-        enum Status {CLOSED, OPEN, LOOTED}
-        Status status;
-        public OpenStatus(Status status){
-            this.status = status;
-        }
-        public boolean isOpen() {return status==Status.OPEN;}
-        public boolean isClosed() {return status==Status.CLOSED;}
-        public boolean isLooted() {return status==Status.LOOTED;}
-
-    }
-    private OpenStatus openStatus;
+    protected ChestStatus status;
     private Item contents;
 
-    public Chest(String name, String description, Item contents) {
+    public Chest(Item contents, Text description) {
+        super(description);
         this.contents = contents;
-        this.openStatus = new OpenStatus(OpenStatus.Status.CLOSED);
+        this.status = new ChestStatus(ChestStatus.Status.CLOSED);
     }
 
     public boolean isOpen() {
-        return openStatus.isOpen();
+        return status.isOpen();
     }
 
+    public Item getContents() {
+        return contents;
+    }
+
+    @Override
     public void act() {
         open();
     }
@@ -35,14 +31,14 @@ public class Chest extends Nonliving {
      *
      */
     public void open(){
-        if (openStatus.isLooted()){
+        if (status.isLooted()){
             System.out.println("The chest is already open and looted.");
         }
-        else if (openStatus.isOpen()){
+        else if (status.isOpen()){
             System.out.println("You open the chest and see: " + contents);
         }
-        else if (openStatus.isClosed()) {
-            openStatus = new OpenStatus(OpenStatus.Status.OPEN);
+        else if (status.isClosed()) {
+            status = new ChestStatus(ChestStatus.Status.OPEN);
             System.out.println("You open the chest and see: " + contents);
         }
     }
@@ -53,14 +49,14 @@ public class Chest extends Nonliving {
      * @param c the character
      */
     public void take(Character c){
-        if (openStatus.isClosed()){
+        if (status.isClosed()){
             System.out.println("Closed, please open first");
         }
-        else if (openStatus.isOpen()){
+        else if (status.isOpen()){
             System.out.println("You take: " + contents.getName());
             giveItem(c);
         }
-        else if (openStatus.isLooted()){
+        else if (status.isLooted()){
             System.out.println("There is nothing to take in this chest.");
         }
     }
