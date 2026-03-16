@@ -14,6 +14,10 @@ public class Inventory {
         return contents;
     }
 
+    public List<Item> getItems() {
+        return contents;
+    }
+
     public void addItem(Item item) {
         contents.add(item);
     }

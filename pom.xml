@@ -40,7 +40,6 @@
           <configuration>
             <excludes>
               <exclude>**/tempSend.java</exclude>
-              <exclude>**/ui/**</exclude>
             </excludes>
           </configuration>
         </plugin>
