@@ -25,4 +25,6 @@ public abstract class NPC extends Entity {
     public abstract void takeDamage(Damage damage);
 
     public abstract void heal(Amount amount);
+
+    public boolean isDead() {return health.getHealth()==0;}
 }

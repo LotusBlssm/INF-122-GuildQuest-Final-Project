@@ -22,7 +22,6 @@ public interface Hostile {
 
     /**
      * Prints a war cry to intimidate opponents
-     * @return true if aggressive, false otherwise
      */
     void warCry();
 }

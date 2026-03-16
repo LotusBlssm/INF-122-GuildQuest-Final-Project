@@ -5,12 +5,13 @@ import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import static edu.uci.inf122.guildquest.ui.UserUI.page;
 
 public class Ferryman extends NPC {
-    // Note: The destination and fare are currently placeholders. 
+    // Note: The destination and fare are currently placeholders.
     private Place destination;
     private Amount fare;
 
-    public Ferryman(Name name, Health health, Place destination, Amount fare) {
-        super(name, health);
+
+    public Ferryman(Name name, Place destination, Amount fare) {
+        super(name, Health.createDefault());
         this.destination = destination;
         this.fare = fare;
     }
@@ -34,16 +35,20 @@ public class Ferryman extends NPC {
 
     @Override
     public void move() {
-
+        System.out.println(getName() + " rows to " + destination + ".");
+        //TODO: Implement actual movement logic.
     }
 
     @Override
     public void takeDamage(Damage damage) {
-
+        health.reduceBy(damage);
+        if (isDead()){
+            System.out.println(name + "died!");
+        }
     }
 
     @Override
     public void heal(Amount amount) {
-
+        health.increaseBy(amount);
     }
 }

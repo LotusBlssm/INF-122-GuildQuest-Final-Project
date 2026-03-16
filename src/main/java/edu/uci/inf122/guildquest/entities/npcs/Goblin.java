@@ -2,6 +2,7 @@ package edu.uci.inf122.guildquest.entities.npcs;
 
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
+import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 
 import static edu.uci.inf122.guildquest.ui.UserUI.page;
 
@@ -19,7 +20,29 @@ public class Goblin extends NPC implements Hostile {
 
     @Override
     public void move() {
+        // TODO: Implement goblin movement logic.
+    }
 
+    @Override
+    public void attack(Entity target) {
+        Damage damage = new Damage(Math.max(1, attackPower));
+
+        if (target instanceof PlayableCharacter playableTarget) {
+            playableTarget.takeDamage(damage);
+            return;
+        }
+
+        if (target instanceof NPC npcTarget) {
+            npcTarget.takeDamage(damage);
+            return;
+        }
+
+        System.out.println(getName() + " cannot damage that target.");
+    }
+
+    @Override
+    public boolean isAggressive() {
+        return true;
     }
 
     @Override
@@ -31,17 +54,6 @@ public class Goblin extends NPC implements Hostile {
     @Override
     public void heal(Amount amount) {
         getHealth().increaseBy(amount);
-    }
-
-    @Override
-    public void attack(Entity target) {
-        System.out.println(getName() + " attacks " + target.getName() + '!');
-        // do something with weapon or level
-    }
-
-    @Override
-    public boolean isAggressive() {
-        return true;
     }
 
     @Override

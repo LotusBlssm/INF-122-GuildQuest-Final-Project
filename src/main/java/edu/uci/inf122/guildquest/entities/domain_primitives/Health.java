@@ -1,9 +1,11 @@
 package edu.uci.inf122.guildquest.entities.domain_primitives;
 
+
 /**
  * The type Health. Has capacity and health
  */
 public class Health {
+    private final static int HEALTH_DEFAULT=10;
     private final int capacity;
     private int health;
 
@@ -55,5 +57,13 @@ public class Health {
     public void increaseBy(Amount amount) {
         if (health + amount.getCount() >= capacity) health = capacity;
         else health+=amount.getCount();
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public static Health createDefault(){
+        return new Health(HEALTH_DEFAULT, HEALTH_DEFAULT);
     }
 }
