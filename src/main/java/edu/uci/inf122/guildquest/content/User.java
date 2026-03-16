@@ -34,4 +34,40 @@ public class User extends GameContent {
     public void setRealm(UUID id) {
         currentRealmID = id;
     }
+
+    public String getUsername() {
+        return userName;
+    }
+
+    public UUID getUserID() {
+        return userID;
+    }
+
+    public List<GameCharacter> getCharacters() {
+        return characters;
+    }
+
+    public List<Campaign> getCampaigns() {
+        return campaigns;
+    }
+
+    public void addCampaign(Campaign campaign) {
+        campaigns.add(campaign);
+    }
+
+    public void removeCampaign(Campaign campaign) {
+        campaigns.remove(campaign);
+    }
+
+    public void addCharacter(GameCharacter character) {
+        characters.add(character);
+    }
+
+    public void removeCharacter(GameCharacter character) {
+        characters.remove(character);
+    }
+
+    public static User createUser(String username) {
+        return UserFactory.createUser(username);
+    }
 }
