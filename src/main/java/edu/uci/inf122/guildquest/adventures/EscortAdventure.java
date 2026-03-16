@@ -11,7 +11,11 @@ import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 // import edu.uci.inf122.guildquest.ui;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
 import edu.uci.inf122.guildquest.api.state.GridState;
-// import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.PlayableCharacter;
+import edu.uci.inf122.guildquest.entities.Assassin;
+import edu.uci.inf122.guildquest.entities.Cleric;
+import edu.uci.inf122.guildquest.entities.Kinght;
 import java.util.UUID;
 
 // The rule: 
@@ -27,7 +31,7 @@ import java.util.UUID;
 //
 // The maximum number of moves for each turn will be 3. (1, 2) or (2, 1) or (-2, 1), etc. 
 //
-// Enemies will be placed on the grid and will move randomly. (the steps they move will be max 2)
+// Enemies are able to attack the player if they are adjacent to the player with the NPC (1 space away in any direction). (NO MOVE)
 // If the player who is with the NPC is at the same grid cell as an enemy, the player will lose and the adventure will end.
 // 
 // if the player wants to attack an enemy, the can only attack an enemy. that is adjacent to them (2 space away in any direction).
@@ -53,7 +57,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     // save/serialize
     private GridState gridState;
     private int playerWithNPC;
-    private List<GameCharacter> playerCharacters; // TWO Charcters (Should be playable character entity later)
+    private PlayableCharacter player1;
+    private PlayableCharacter player2;
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
@@ -73,14 +78,9 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 // logic to change the grid state based on game events
             }
         };
-        UUID player1ID = players.get(0).getID();
-        UUID player2ID = players.get(1).getID();
-        GameCharacter player1_char = new GameCharacter("Player 1", "Warrior", 1, player1ID); // placeholder
-        GameCharacter player2_char = new GameCharacter("Player 2", "Mage", 1, player2ID); // placeholder
-
-        playerCharacters = new ArrayList<>();
-        playerCharacters.add(player1_char);
-        playerCharacters.add(player2_char);
+        // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
+        player1 = new Assasin(players.get(0).getName()); // placeholder
+        player2 = new Cleric(players.get(1).getName()); // placeholder
 
         playerWithNPC = 0; // default is player1 is with the NPC, but maybe we can ask.
     }
@@ -160,7 +160,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             // if there is an NPC or Items, then interact with them (ex: pick up items, get hints from NPCs, etc.)
             // if player with no NPC is on the same grid cell as the destination, then the destination location is known.
             // if the player with the NPC is on the same grid cell as the destination, then end the game with a win.
-            
+
             // for (Entity content : gridState.getCellContent(moveRow,
             // moveCol).getContent()) {
             // if (content.contains("Enemy") && playerWithNPC ==
@@ -174,13 +174,26 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
 
         // attack logic: psuedocode for now
         if (attack) {
+            // TODO: Identify which enemy the player wants to attack (only one enemy can be attacked per turn) 
+            // ask the player for the direction (since they don't know the enemy's location, they only know there is an enemy near them (within 2 spaces)) 
+            // if the user choice (direction) is correct, then the attack is successful and the enemies take damage 
+            // player can choose: up, down, left, right
+            // the attack is applied to all the enemies in that direction within 2 spaces 
 
+            // collect the enemies in the chosen direction within 2 spaces (don't include the non-enemy entities) 
+            for (enemy in enemies in that direction within 2 spaces) {
+                 player.attack(enemy); 
+                 if (enemy is defeated) {
+                    // remove the enemy from the grid
+                    // let the player know that they defeated an enemy. 
+                 }
+            }
         }
 
 
         // Enemies:
-        // - move randomly
         // - attack player if adjacent to player with NPC
+        // - if the player attacked them, the enemy can attack the player back during their turn
 
     }
 
@@ -244,11 +257,12 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
 
     }
 
+    void initializePlayerCharacter() {
+        // logic to let the player choose their character and tools, etc.
+    }
+
     public void initializeUser() {
         // logic to set up the user, which user is with the NPC, etc.
-        User player1 = getPlayer(0);
-        User player2 = getPlayer(1);
-
         // default is player1 is with the NPC, but maybe we can ask. (so, )
         // isNPCWithPlayer = 0;
 

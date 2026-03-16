@@ -19,7 +19,6 @@ public class GridCell {
             content = null;
     }
 
-    // FIXED: this was previously backwards
     public boolean hasContent() {
         return content != null;
     }
