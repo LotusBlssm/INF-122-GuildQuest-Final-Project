@@ -10,7 +10,7 @@ public abstract class NPC extends Entity {
     protected Health health;
 
     public NPC(Name name, Health health) {
-        this.name = name;
+        super(name);
         this.health = health;
     }
 

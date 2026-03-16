@@ -9,7 +9,7 @@ public class Name {
     /**
      * The constant pattern defining what a valid name is.
      */
-    public final static Pattern pattern = Pattern.compile("^[A-Za-z0-9]+$");
+    public final static Pattern pattern = Pattern.compile("^[A-Za-z0-9 ]+$");
 
     private final String name;
 

@@ -1,14 +1,15 @@
 package edu.uci.inf122.guildquest.entities.nonlivings;
 
 import edu.uci.inf122.guildquest.content.Item;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
 
 public class Chest extends Nonliving {
     protected ChestStatus status;
     private Item contents;
 
-    public Chest(Item contents, Text description) {
-        super(description);
+    public Chest(Name name, Item contents, Text description) {
+        super(name, description);
         this.contents = contents;
         this.status = new ChestStatus(ChestStatus.Status.CLOSED);
     }

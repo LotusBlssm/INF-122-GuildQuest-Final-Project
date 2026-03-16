@@ -1,6 +1,7 @@
 package edu.uci.inf122.guildquest.entities.nonlivings;
 
 import edu.uci.inf122.guildquest.content.Item;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
 
 public class LockedChest extends Chest {
@@ -8,8 +9,8 @@ public class LockedChest extends Chest {
     //  but we can change it to Item or something else later. 
     private String key;
 
-    public LockedChest(Text description, Item contents, String key) {
-        super(contents, description);
+    public LockedChest(Name name, Text description, Item contents, String key) {
+        super(name, contents, description);
         this.key = key;
         this.status = new ChestStatus(ChestStatus.Status.LOCKED);
     }

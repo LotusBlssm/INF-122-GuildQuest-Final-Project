@@ -11,8 +11,8 @@ public abstract class Item extends Entity {
     private String description;
 
     public Item(UUID itemID, Name name, int rarity, String description) {
+        super(name);
         this.itemID = itemID;
-        this.name = name;
         this.rarity = rarity;
         this.description = description;
     }
