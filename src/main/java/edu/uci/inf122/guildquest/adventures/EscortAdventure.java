@@ -3,6 +3,7 @@ package edu.uci.inf122.guildquest.adventures;
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
 import edu.uci.inf122.guildquest.api.state.State;
 import edu.uci.inf122.guildquest.content.Realm;
+import edu.uci.inf122.guildquest.content.GameCharacter;
 import edu.uci.inf122.guildquest.content.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,8 @@ import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 // import edu.uci.inf122.guildquest.ui;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
 import edu.uci.inf122.guildquest.api.state.GridState;
+// import edu.uci.inf122.guildquest.entities.Entity;
+import java.util.UUID;
 
 // The rule: 
 // starting point: (0, 0) with an NPC that needs to be escorted to the destination that the NPC knows. (The player does not know the destination)
@@ -99,10 +102,18 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     public void acceptInput() {
         // handle player input: moving the player, attacking enemies
 
+        // Players:
+        // - attack
+        // - move
+        // - ask NPC for hints
+
+        // Enemies:
+        // - move randomly
+        // - attack player if adjacent to player with NPC
+
     }
 
     public void advanceCycle() {
-        // advance the game state, move entities, check win conditions
     }
 
     public AdventureSnapshot saveSnapshot() {
@@ -123,6 +134,42 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // 3 items on grid
         // they are all placed randomly, but the distance between the starting point and
         // enemies should be at least 6 spaces away
+
+        // for now, we will just use String for the entities, but we will replace it
+        // with actual Entity objects later.
+        String princess_npc = "Princess NPC"; // placeholder for the NPC that needs to be escorted
+        UUID user1 = UUID.randomUUID(); // placeholder for the destination that the NPC knows
+        UUID user2 = UUID.randomUUID();
+        // need to replace with actual playable characters later
+        GameCharacter player1_char = new GameCharacter("Player 1", "Warrior", 1, user1); // placeholder for player 1's
+        GameCharacter player2_char = new GameCharacter("Player 2", "Mage", 1, user2); // placeholder for player 2's
+        // character
+
+        String enemy1 = "Goblin Enemy1"; // placeholder for enemy 1
+        String enemy2 = "Goblin Enemy2"; // placeholder for enemy 2
+        String enemy3 = "Goblin Enemy3"; // placeholder for enemy 3
+        String[] enemies = { enemy1, enemy2, enemy3 };
+
+        String item1 = "Item1"; // placeholder for item 1
+        String item2 = "Item2"; // placeholder for item 2
+        String item3 = "Item3"; // placeholder for item 3
+        String[] items = { item1, item2, item3 };
+
+        String npc1 = "NPC1"; // placeholder for other NPC 1
+        String npc2 = "NPC2"; // placeholder for other NPC 2
+        String[] npcs = { npc1, npc2 };
+
+        String destination = "Destination";
+
+        // randomly place the entities on the grid
+        // princess, player1, and player2 are placed at the same starting point.
+        gridState.setCell(0, 0, princess_npc);
+        gridState.setCell(0, 0, "Player 1");
+        gridState.setCell(0, 0, "Player 2");
+
+        gridState.initializeGrid(enemies);
+        gridState.initializeGrid(items);
+        gridState.initializeGrid(npcs);
 
     }
 
