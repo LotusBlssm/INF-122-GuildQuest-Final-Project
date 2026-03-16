@@ -14,7 +14,8 @@ public class TerminalGrid extends GridState {
         int longestNameLen=0;
         for (List<GridCell> row : grid.getGrid()){
             for (GridCell cell : row){
-                longestNameLen = Math.max(cell.getContent().getName().toString().length(), longestNameLen);
+                String name = cell.getContent().getName().toString();
+                longestNameLen = Math.max(name.length(), longestNameLen);
             }
         }
 
@@ -23,10 +24,11 @@ public class TerminalGrid extends GridState {
         int padding;
         for (List<GridCell> row : grid.getGrid()){
             for (GridCell cell : row){
-                padding = longestNameLen - cell.getContent().getName().toString().length();
+                String name = cell.getContent().getName().toString();
+                padding = longestNameLen - name.length();
                 leftPad = padding / 2;
                 rightPad = padding - leftPad;
-                out.print("| "+" ".repeat(leftPad)+cell.getContent().getName()+" ".repeat(rightPad)+" |");
+                out.print("| "+" ".repeat(leftPad)+name+" ".repeat(rightPad)+" |");
             }
             out.print('\n');
         }

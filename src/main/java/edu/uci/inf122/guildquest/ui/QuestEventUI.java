@@ -147,12 +147,21 @@ public class QuestEventUI {
         } else if (choice == 2) {
             character = CharacterUI.createCharacter(c.getOwner());
         }
+        if (character == null)
+            return;
         qe.addParticipant(character);
         page.print("added " + character.getName() + "!\n");
     }
 
     private static void removeCharacters(QuestEvent qe, Campaign c) {
-        qe.getParticipants().remove(CharacterUI.chooseCharacter(c.getOwner().getCharacters()));
+        if (qe.getParticipants().isEmpty()) {
+            page.print("No characters to remove.\n");
+            return;
+        }
+        GameCharacter character = CharacterUI.chooseCharacter(qe.getParticipants());
+        if (character == null)
+            return;
+        qe.getParticipants().remove(character);
     }
 
     private static void rewardCharacter(QuestEvent qe, Campaign c) {
@@ -178,12 +187,16 @@ public class QuestEventUI {
     }
 
     public static String timelineString(Campaign c) {
-        c.getQuestEvents().sort(Comparator.comparing(QuestEvent::getStartTime));
+        c.getQuestEvents().sort(Comparator.comparing(QuestEvent::getStartTime,
+                Comparator.nullsLast(Comparator.naturalOrder())));
         StringBuilder timeLine = new StringBuilder();
         String time;
         for (QuestEvent qe : c.getQuestEvents()) {
-            time = qe.getStartTime().toString() +
-                    ((qe.getEndTime() == null) ? "" : " to " + qe.getEndTime().toString() + "\n");
+            WorldTime startTime = qe.getStartTime();
+            WorldTime endTime = qe.getEndTime();
+            String startString = (startTime == null) ? "unscheduled" : startTime.toString();
+            String endString = (endTime == null) ? "" : " to " + endTime.toString() + "\n";
+            time = startString + endString;
             timeLine.append("    ").append(qe.getTitle()).append("; ").append(time).append("; Realm: ")
                     .append(qe.getRealm().toString());
         }
