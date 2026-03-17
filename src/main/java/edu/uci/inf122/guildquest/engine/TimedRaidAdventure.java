@@ -102,7 +102,7 @@ public class TimedRaidAdventure extends MiniAdventure {
         System.out.println();
         System.out.println(player.getUsername() + "'s turn (Time: "
                 + turnTimer.getSecondsRemaining(currentPlayerIndex) + "s)");
-        System.out.println("Commands: move <n/s/e/w>, attack <n/s/e/w>, end");
+        System.out.println("Commands: move <n/s/e/w>, attack <n/s/e/w>, open <n/s/e/w>, end");
         System.out.print("> ");
 
         pendingCommand = scanner.nextLine().trim().toLowerCase();
@@ -146,6 +146,13 @@ public class TimedRaidAdventure extends MiniAdventure {
                     return false;
                 }
                 handleAttack(parts[1]);
+            }
+            case "open" -> {
+                if (parts.length < 2) {
+                    System.out.println("Usage: open <n/s/e/w>");
+                    return false;
+                }
+                handleOpen(parts[1]);
             }
             case "end" -> System.out.println("Turn ended.");
             default -> {
@@ -227,6 +234,39 @@ public class TimedRaidAdventure extends MiniAdventure {
         } else {
             System.out.println(pc.getName() + " cannot attack.");
         }
+    }
+
+    private void handleOpen(String direction) {
+        int[] current = playerPositions[currentPlayerIndex];
+        int targetRow = current[0];
+        int targetCol = current[1];
+
+        switch (direction) {
+            case "n" -> targetRow--;
+            case "s" -> targetRow++;
+            case "e" -> targetCol++;
+            case "w" -> targetCol--;
+            default -> {
+                System.out.println("Invalid direction. Use n/s/e/w.");
+                return;
+            }
+        }
+
+        if (!grid.isValidPosition(targetRow, targetCol)) {
+            System.out.println("Nothing to open there.");
+            return;
+        }
+
+        GridCell targetCell = grid.getCell(targetRow, targetCol);
+        if (targetCell.isEmpty()) {
+            System.out.println("Nothing in that direction.");
+            return;
+        }
+
+        Entity target = targetCell.getContent().get(0);
+        // TODO: chest interaction, loot items, etc.
+        System.out.println("Interacting with " + target.getName() + "...");
+        target.act();
     }
 
     private void renderGrid() {
