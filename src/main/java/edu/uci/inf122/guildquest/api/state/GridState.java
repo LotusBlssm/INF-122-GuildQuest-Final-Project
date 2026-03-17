@@ -87,4 +87,20 @@ public abstract class GridState implements State {
     public GridCell getCellContent(int row, int col) {
         return getCell(row, col);
     }
+
+    public int[] getLocation(Entity entity) {
+        for (int row = 0; row < getLength(); row++) {
+            for (int col = 0; col < getWidth(); col++) {
+                GridCell cell = getCell(row, col);
+                if (!cell.isEmpty() && cell.getContent().contains(entity)) {
+                    return new int[] { row, col };
+                }
+            }
+        }
+        throw new IllegalArgumentException("Entity not found on the grid.");
+    }
+
+    public boolean checkDistance(int row, int col, int distance) {
+        return Math.abs(row) + Math.abs(col) <= distance;
+    }
 }

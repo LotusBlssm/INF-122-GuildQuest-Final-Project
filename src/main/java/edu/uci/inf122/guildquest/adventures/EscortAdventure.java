@@ -77,12 +77,13 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     // the grid, etc.
 
     public EscortAdventure(List<Realm> realms, List<Entity> entities, List<WinCondition> winCondition,
-                           List<User> players) {
+            List<User> players) {
         super(realms, entities, winCondition, players);
         gridState = new TerminalGrid(6, 6);
         // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
-//        player1 = Assassin.getInstance(new Name("assassin")); // placeholder
-//        player2 = Cleric.getInstance(new Name(players.get(1).getName())); // placeholder
+        // player1 = Assassin.getInstance(new Name("assassin")); // placeholder
+        // player2 = Cleric.getInstance(new Name(players.get(1).getName())); //
+        // placeholder
     }
 
     public void play() {
@@ -123,24 +124,24 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // give them the fact if there ar enemies around them (2 spaces away in any
         // direction).
 
-        boolean answered = false;
-        while (!answered) {
+        int currentPlayer = 0;
+        while (currentPlayer < 1) {
             int choice = 1; // placeholder for player input
             switch (choice) {
                 case 1 -> {
                     // move logic
-                    makeMove();
-                    answered = true;
+                    makeMove(currentPlayer);
+                    currentPlayer += 1;
                 }
                 case 2 -> {
                     // attack logic
-                    makeAttack();
-                    answered = true;
+                    makeAttack(currentPlayer);
+                    currentPlayer += 1;
                 }
                 case 3 -> {
                     // ask for hints
                     makeHintRequest();
-                    answered = true;
+                    currentPlayer += 1;
                 }
                 default -> {
                     // prompt player for valid input
@@ -271,8 +272,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // they are all placed randomly, but the distance between the starting point and
         // enemies should be at least 6 spaces away
         Princess princess_npc = new Princess(
-                new Name("princess"), new Health(10), new Amount(2)
-        );
+                new Name("princess"), new Health(10), new Amount(2));
 
         Goblin enemy1 = new Goblin(new Name("Goblin 1"), new Health(10), new Level(1));
         Goblin enemy2 = new Goblin(new Name("Goblin 2"), new Health(12), new Level(1));
@@ -284,8 +284,15 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
         Item[] items = { item1, item2, item3 };
 
-        NPC npc1 = new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10)); // placeholder for other NPC 1
-        NPC npc2 = new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100)); // placeholder for other NPC 1
+        NPC npc1 = new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10)); // placeholder
+                                                                                                              // for
+                                                                                                              // other
+                                                                                                              // NPC 1
+        NPC npc2 = new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100)); // placeholder
+                                                                                                                       // for
+                                                                                                                       // other
+                                                                                                                       // NPC
+                                                                                                                       // 1
         NPC[] npcs = { npc1, npc2 };
 
         // randomly place the entities on the grid
@@ -311,37 +318,97 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 0 - Assassin
                 1 - Cleric
                 """, 1);
-        if (p1Choice==1){
-            player1=Cleric.getInstance(new Name("Player 1")); // placeholder
-            player2=Assassin.getInstance(new Name("Player 2"));
+        if (p1Choice == 1) {
+            player1 = Cleric.getInstance(new Name("Player 1")); // placeholder
+            player2 = Assassin.getInstance(new Name("Player 2"));
             page.print("Player 1 is the assassin, player 2 is the cleric\n");
-        }
-        else{
-            player1=Assassin.getInstance(new Name("Assassin")); // placeholder
-            player2=Cleric.getInstance(new Name("Cleric"));
+        } else {
+            player1 = Assassin.getInstance(new Name("Assassin")); // placeholder
+            player2 = Cleric.getInstance(new Name("Cleric"));
             page.print("Player 1 is the assassin, player 2 is the cleric\n");
         }
 
     }
 
     // player action logic: move, attack, ask for hints
-    public void makeMove() {
+    public void makeMove(int playerNumber) {
         // logic to let the player make move choices
+        PlayableCharacter currentPlayer = playerNumber == 0 ? player1 : player2;
+        // get move values from player input
+        int moveRow = 4; // placeholder for player input
+        int moveCol = 4; // placeholder for player input
+        while (!gridState.isValidPosition(moveRow, moveCol)
+                || !gridState.checkDistance(moveRow, moveCol, 3)) {
+            // prompt player for valid input
+            moveRow = 2;
+            moveCol = 1;
+        }
+        // move the player character on the grid
+        gridState.setCell(moveRow, moveCol, currentPlayer);
     }
 
-    public void makeAttack() {
+    public void makeAttack(int currentPlayer) {
         // logic to let the player make attack choices
+
+        // step1: pick the direction to attack (since they don't know the enemy's
+        // location)
+        // player can choose: up, down, left, right
+        String direction = "up"; // placeholder for player input
+        int x = 0; // placeholder for player input
+        int y = 0;
+        switch (direction) {
+            case "up" -> {
+                // logic to attack up
+                y += 2;
+                break;
+            }
+            case "down" -> {
+                // logic to attack down
+                y -= 2;
+                break;
+            }
+            case "left" -> {
+                // logic to attack left
+                x -= 2;
+                break;
+            }
+            case "right" -> {
+                // logic to attack right
+                x += 2;
+                break;
+            }
+            default -> {
+                // prompt player for valid input
+            }
+        }
+
+        // step2: apply the attack to all the enemies in that direction within 2 spaces
+
+        // edge cases:
+        // if the player is at the edge of the grid
     }
 
     public void makeHintRequest() {
         // logic to let the player ask for hints
+
+        // check the distance between the player with the NPC and the destination
+        int[] playerPosition = gridState.getLocation(player1);
+        if (gridState.checkDistance(playerPosition[0], playerPosition[1], 2)) {
+            // give clear hints about the destination (ex: steps)
+            // tell drirection
+        } else {
+            // give vague hints about the destination (ex: direction)
+            // tell "Far....."
+        }
     }
 
     public boolean checkRunningCondition() {
-        // check if the game should continue running (win/lose conditions)
+        // logic to check if the adventure should continue running
+        // check win conditions and lose conditions
         return false; // placeholder
     }
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
         List<WinCondition> winConditions = new ArrayList<>();
         winConditions.add(new TimeLimitCondition(new Time(2)));
         EscortAdventure adventure = new EscortAdventure(
