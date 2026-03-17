@@ -68,17 +68,17 @@ public abstract class GridState implements State {
         return Math.abs(row1 - row2) + Math.abs(col1 - col2);
     }
 
-    public void initializeGrid(Entity[] entities) {
+    public void initializeGrid(List<Entity> entities) {
         // logic to initialize the grid with the entities in the adventure
         // for now, we will just randomly place the entities on the grid, but we can
         // make it more complex later (e.g. certain entities can only be placed in
         // certain areas, etc.)
         int placedAllEntities = 0;
-        while (placedAllEntities < entities.length) {
+        while (placedAllEntities < entities.size()) {
             int row = (int) (Math.random() * getLength());
             int col = (int) (Math.random() * getWidth());
             if (getCell(row, col).isEmpty() && getDistance(0, 0, row, col) >= 6) {
-                setCell(row, col, entities[placedAllEntities]);
+                setCell(row, col, entities.get(placedAllEntities));
                 placedAllEntities += 1;
             }
         }
@@ -111,5 +111,9 @@ public abstract class GridState implements State {
             return;
         }
         return; // Entity not found, do nothing
+    }
+
+    public int getDistance(int[] pos1, int[] pos2) {
+        return Math.abs(pos1[0] - pos2[0]) + Math.abs(pos1[1] - pos2[1]);
     }
 }

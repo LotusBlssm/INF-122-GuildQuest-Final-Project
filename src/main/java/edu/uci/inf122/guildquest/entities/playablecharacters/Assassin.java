@@ -16,7 +16,7 @@ public class Assassin extends PlayableCharacter implements CanAttack {
         this.attackPower = new Amount(20);
     }
 
-    public static Assassin getInstance(Name name){
+    public static Assassin getInstance(Name name) {
         if (instance == null) {
             instance = new Assassin(name);
         }

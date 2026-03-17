@@ -28,7 +28,6 @@ public abstract class PlayableCharacter extends Entity {
 
     public abstract void takeDamage(Damage damage);
 
-
     /**
      * Heals this player.
      *
@@ -37,6 +36,7 @@ public abstract class PlayableCharacter extends Entity {
     protected void heal(Amount amount) {
         health.increaseBy(amount);
     }
+
     protected void heal(DecimalAmount amount) {
         health.increaseBy(amount);
     }
@@ -51,8 +51,7 @@ public abstract class PlayableCharacter extends Entity {
             if (target instanceof NPC npcTarget) {
                 npcTarget.takeDamage(damage);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("An error occurred while trying to deal damage: " + e.getMessage());
         }
     }
@@ -71,5 +70,10 @@ public abstract class PlayableCharacter extends Entity {
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public void attack(Entity target) {
+        throw new UnsupportedOperationException(
+                getClass().getSimpleName() + " does not implement attack(Entity) yet.");
     }
 }

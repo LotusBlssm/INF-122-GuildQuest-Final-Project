@@ -72,6 +72,9 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     private final TerminalGrid gridState;
     private PlayableCharacter player1;
     private PlayableCharacter player2;
+    private List<Entity> enemies;
+    private List<Entity> items;
+    private List<Entity> npcs;
     private final static Page page = Page.getPage();
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
@@ -247,6 +250,25 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // enemy.attack(the other player);
         // }
         // }
+
+        // check if the enemy is within 2 spaces of the player with the NPC
+        // if so, attack the players
+        // else, skip the enemy's turn for now
+        int[] player1Position = gridState.getLocation(this.player1);
+        int[] player2Position = gridState.getLocation(this.player2);
+        for (Entity enemy : enemies) {
+            if (enemy instanceof Goblin goblinEnemy) {
+                int[] enemyPosition = gridState.getLocation(enemy);
+                if (gridState.getDistance(player1Position, enemyPosition) <= 2) {
+                    goblinEnemy.attack(player1);
+                }
+                if (gridState.getDistance(player2Position, enemyPosition) <= 2) {
+                    goblinEnemy.attack(player2);
+                }
+                break; // only one enemy can attack per turn
+            }
+        }
+
     }
 
     public void advanceCycle() {
@@ -277,12 +299,18 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         Goblin enemy1 = new Goblin(new Name("Goblin 1"), new Health(10), new Level(1));
         Goblin enemy2 = new Goblin(new Name("Goblin 2"), new Health(12), new Level(1));
         Goblin enemy3 = new Goblin(new Name("Goblin 3"), new Health(15), new Level(2));
-        Goblin[] enemies = { enemy1, enemy2, enemy3 };
+        enemies = new ArrayList<>();
+        enemies.add(enemy1);
+        enemies.add(enemy2);
+        enemies.add(enemy3);
 
         Item item1 = ItemFactory.createWeapon("blue sword", 1, "a blue sword", 6);
         Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
         Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
-        Item[] items = { item1, item2, item3 };
+        items = new ArrayList<>();
+        items.add(item1);
+        items.add(item2);
+        items.add(item3);
 
         NPC npc1 = new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10)); // placeholder
                                                                                                               // for
@@ -293,7 +321,10 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                                                                                                                        // other
                                                                                                                        // NPC
                                                                                                                        // 1
-        NPC[] npcs = { npc1, npc2 };
+
+        npcs = new ArrayList<>();
+        npcs.add(npc1);
+        npcs.add(npc2);
 
         // randomly place the entities on the grid
         // princess, player1, and player2 are placed at the same starting point.
@@ -399,9 +430,9 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         for (Entity enemy : enemiesToAttack) {
             if (enemy instanceof Goblin goblinEnemy) {
                 if (currentPlayer == 0) {
-                    // player1.attack(enemy);
+                    player1.attack(goblinEnemy);
                 } else {
-                    // player2.attack(enemy);
+                    player2.attack(goblinEnemy);
                 }
                 // if the enemy is defeated, remove it from the grid and let the player know
                 if (goblinEnemy.getHealth().getHealth() <= 0) { // chain..!
