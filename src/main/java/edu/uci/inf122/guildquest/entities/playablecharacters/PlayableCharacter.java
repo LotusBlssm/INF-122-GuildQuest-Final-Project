@@ -13,7 +13,7 @@ public abstract class PlayableCharacter extends Entity {
 
     public PlayableCharacter(Name name, Health health, Level level, CharacterClass characterClass) {
         this.name = name;
-        health = health;
+        this.health = health;
         this.level = level;
         this.characterClass = characterClass;
         this.inventory = new Inventory();

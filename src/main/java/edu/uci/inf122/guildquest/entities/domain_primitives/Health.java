@@ -67,6 +67,11 @@ public class Health {
         return health;
     }
 
+    @Override
+    public String toString() {
+        return health + "/" + capacity;
+    }
+
     public static Health createDefault(){
         return new Health(HEALTH_DEFAULT, HEALTH_DEFAULT);
     }
