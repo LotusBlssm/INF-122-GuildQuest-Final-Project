@@ -266,6 +266,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                     goblinEnemy.attack(player2);
                 }
                 break; // only one enemy can attack per turn
+                // TODO: add more concrete logic for enemy attacks (ex: prioritize an enemy who
+                // can attack many players)
             }
         }
 
