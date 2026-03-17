@@ -381,9 +381,36 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 // prompt player for valid input
             }
         }
-
-        // step2: apply the attack to all the enemies in that direction within 2 spaces
-
+        // step2: collect all the enemies in the chosen direction within 2 spaces
+        int[] playerPosition = gridState.getLocation(currentPlayer == 0 ? player1 : player2);
+        List<Entity> enemiesToAttack = new ArrayList<>();
+        for (int i = 1; i <= 2; i++) {
+            int newRow = playerPosition[0] + (y == 0 ? 0 : i * (y / Math.abs(y)));
+            int newCol = playerPosition[1] + (x == 0 ? 0 : i * (x / Math.abs(x)));
+            if (gridState.isValidPosition(newRow, newCol)) {
+                for (Entity content : gridState.getCellContent(newRow, newCol).getContent()) {
+                    if (content instanceof Goblin) { // check if the entity is an enemy
+                        enemiesToAttack.add(content);
+                    }
+                }
+            }
+        }
+        // step3: apply the attack to all the enemies in that direction within 2 spaces
+        for (Entity enemy : enemiesToAttack) {
+            if (enemy instanceof Goblin goblinEnemy) {
+                if (currentPlayer == 0) {
+                    // player1.attack(enemy);
+                } else {
+                    // player2.attack(enemy);
+                }
+                // if the enemy is defeated, remove it from the grid and let the player know
+                if (goblinEnemy.getHealth().getHealth() <= 0) { // chain..!
+                    int[] enemyPosition = gridState.getLocation(goblinEnemy);
+                    gridState.removeEntity(enemyPosition[0], enemyPosition[1], goblinEnemy);
+                    page.print("You defeated an enemy!\n");
+                }
+            }
+        }
         // edge cases:
         // if the player is at the edge of the grid
     }

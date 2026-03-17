@@ -8,6 +8,7 @@ import static edu.uci.inf122.guildquest.ui.UserUI.page;
 
 public class Goblin extends NPC implements Hostile {
     private Level level;
+
     public Goblin(Name name, Health health, Level level) {
         super(name, health);
         this.level = level;
@@ -21,6 +22,10 @@ public class Goblin extends NPC implements Hostile {
     @Override
     public void move() {
         // TODO: Implement goblin movement logic.
+    }
+
+    public Health getHealth() {
+        return health;
     }
 
     @Override

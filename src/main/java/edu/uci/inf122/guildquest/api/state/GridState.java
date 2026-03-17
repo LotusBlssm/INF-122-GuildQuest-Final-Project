@@ -103,4 +103,13 @@ public abstract class GridState implements State {
     public boolean checkDistance(int row, int col, int distance) {
         return Math.abs(row) + Math.abs(col) <= distance;
     }
+
+    public void removeEntity(int row, int col, Entity entity) {
+        GridCell cell = getCell(row, col);
+        if (!cell.isEmpty() && cell.getContent().contains(entity)) {
+            cell.removeContent();
+            return;
+        }
+        return; // Entity not found, do nothing
+    }
 }
