@@ -9,7 +9,9 @@ import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 import edu.uci.inf122.guildquest.content.Realm;
 import edu.uci.inf122.guildquest.content.User;
 import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.interfaces.CanAttack;
 import edu.uci.inf122.guildquest.entities.npcs.Hostile;
+import edu.uci.inf122.guildquest.entities.npcs.NPC;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 
 import java.util.ArrayList;
@@ -66,8 +68,29 @@ public class TimedRaidAdventure extends MiniAdventure {
             printStatus();
 
             turnTimer.startTurn(currentPlayerIndex);
-            acceptInput();
-            advanceCycle();
+            boolean validCommand = false;
+            while (!validCommand && !gameOver) {
+                acceptInput();
+                if (turnTimer.isExpired(currentPlayerIndex)) {
+                    turnTimer.endTurn();
+                    System.out.println(getCurrentPlayer().getUsername() + " ran out of time!");
+                    gameOver = true;
+                    break;
+                }
+                validCommand = processCommand(pendingCommand);
+                if (!validCommand) {
+                    System.out.print("> ");
+                    pendingCommand = scanner.nextLine().trim().toLowerCase();
+                }
+            }
+            if (!gameOver) {
+                removeDeadEntities();
+                turnTimer.endTurn();
+                if (!checkGameOver()) {
+                    turnNumber++;
+                    swapTurn();
+                }
+            }
         }
 
         announceResults();
@@ -79,7 +102,7 @@ public class TimedRaidAdventure extends MiniAdventure {
         System.out.println();
         System.out.println(player.getUsername() + "'s turn (Time: "
                 + turnTimer.getSecondsRemaining(currentPlayerIndex) + "s)");
-        System.out.println("Commands: move <n/s/e/w>, end");
+        System.out.println("Commands: move <n/s/e/w>, attack <n/s/e/w>, end");
         System.out.print("> ");
 
         pendingCommand = scanner.nextLine().trim().toLowerCase();
@@ -87,16 +110,7 @@ public class TimedRaidAdventure extends MiniAdventure {
 
     @Override
     public void advanceCycle() {
-        if (turnTimer.isExpired(currentPlayerIndex)) {
-            turnTimer.endTurn();
-            System.out.println(getCurrentPlayer().getUsername() + " ran out of time!");
-            gameOver = true;
-            return;
-        }
-
-        processCommand(pendingCommand);
         turnTimer.endTurn();
-
         if (!checkGameOver()) {
             turnNumber++;
             swapTurn();
@@ -125,6 +139,13 @@ public class TimedRaidAdventure extends MiniAdventure {
                     return false;
                 }
                 handleMove(parts[1]);
+            }
+            case "attack" -> {
+                if (parts.length < 2) {
+                    System.out.println("Usage: attack <n/s/e/w>");
+                    return false;
+                }
+                handleAttack(parts[1]);
             }
             case "end" -> System.out.println("Turn ended.");
             default -> {
@@ -169,6 +190,43 @@ public class TimedRaidAdventure extends MiniAdventure {
         current[1] = newCol;
 
         System.out.println(pc.getName() + " moved " + directionName(direction) + ".");
+    }
+
+    private void handleAttack(String direction) {
+        int[] current = playerPositions[currentPlayerIndex];
+        int targetRow = current[0];
+        int targetCol = current[1];
+
+        switch (direction) {
+            case "n" -> targetRow--;
+            case "s" -> targetRow++;
+            case "e" -> targetCol++;
+            case "w" -> targetCol--;
+            default -> {
+                System.out.println("Invalid direction. Use n/s/e/w.");
+                return;
+            }
+        }
+
+        if (!grid.isValidPosition(targetRow, targetCol)) {
+            System.out.println("Nothing to attack there.");
+            return;
+        }
+
+        GridCell targetCell = grid.getCell(targetRow, targetCol);
+        if (targetCell.isEmpty()) {
+            System.out.println("No entity in that direction.");
+            return;
+        }
+
+        PlayableCharacter pc = playerCharacters.get(currentPlayerIndex);
+        Entity target = targetCell.getContent().get(0);
+
+        if (pc instanceof CanAttack attacker) {
+            attacker.attack(target);
+        } else {
+            System.out.println(pc.getName() + " cannot attack.");
+        }
     }
 
     private void renderGrid() {
@@ -254,6 +312,21 @@ public class TimedRaidAdventure extends MiniAdventure {
 
     private void swapTurn() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+    }
+
+    private void removeDeadEntities() {
+        for (int r = 0; r < grid.getLength(); r++) {
+            for (int c = 0; c < grid.getWidth(); c++) {
+                GridCell cell = grid.getCell(r, c);
+                if (!cell.isEmpty()) {
+                    Entity e = cell.getContent().get(0);
+                    if (e instanceof NPC npc && npc.isDead()) {
+                        cell.removeContent();
+                        System.out.println(npc.getName() + " has been slain!");
+                    }
+                }
+            }
+        }
     }
 
     private boolean checkGameOver() {
