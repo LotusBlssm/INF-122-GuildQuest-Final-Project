@@ -13,4 +13,14 @@ public class Consumable extends Item {
     public QuestEvent getQuestAssociated() {
         return questAssociated;
     }
+
+    @Override
+    public boolean isUsable() {
+        return true;
+    }
+
+    @Override
+    public String getItemType() {
+        return "Consumable";
+    }
 }
