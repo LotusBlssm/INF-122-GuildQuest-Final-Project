@@ -13,4 +13,14 @@ public class Weapon extends Item {
     public int getDamage() {
         return damage;
     }
+
+    @Override
+    public boolean isUsable() {
+        return true;
+    }
+
+    @Override
+    public String getItemType() {
+        return "Weapon";
+    }
 }
