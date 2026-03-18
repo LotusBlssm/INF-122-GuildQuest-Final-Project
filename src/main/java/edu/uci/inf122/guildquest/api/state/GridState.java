@@ -64,6 +64,41 @@ public abstract class GridState implements State {
         grid.get(row).get(col).setContent(e);
     }
 
+    /**
+     * Moves an entity into a cell at row, col, IF it is empty.
+     *
+     * @param row the row
+     * @param col the col
+     * @param e   the entity
+     * @return whether operation succeeded or not
+     */
+// Helper method to get a specific cell
+    public void setCellWithChecking(GridCell targetCell, Entity e) {
+        int[] loc = getLocationCords(targetCell);
+        int row = loc[0];
+        int col = loc[1];
+        if (!isValidPosition(row, col)) {
+            throw new IllegalArgumentException("Invalid grid position: (" + row + ", " + col + ")");
+        }
+        if (grid.get(row).get(col).hasContent()){
+            throw new IllegalArgumentException("Grid already contains + " + grid.get(row).get(col).getContent().get(0).getName());
+        } else{
+            grid.get(row).get(col).setContent(e);
+        }
+    }
+
+    public boolean canMove(Entity e, char direction){
+        int[] target = getLocationCords(getLocation(e));
+        switch (direction){
+            case 'e' -> target[1]+=1;
+            case 'w' -> target[1]-=1;
+            case 's' -> target[0]+=1;
+            case 'n' -> target[0]-=1;
+            default -> throw new IllegalStateException("Unexpected direction: " + direction);
+        }
+        return isValidPosition(target[0], target[1]) && getCell(target[0], target[1]).isEmpty();
+    }
+
     public int getDistance(int row1, int col1, int row2, int col2) {
         return Math.abs(row1 - row2) + Math.abs(col1 - col2);
     }
@@ -88,12 +123,35 @@ public abstract class GridState implements State {
         return getCell(row, col);
     }
 
-    public int[] getLocation(Entity entity) {
+    public GridCell getLocation(Entity entity) {
         for (int row = 0; row < getLength(); row++) {
             for (int col = 0; col < getWidth(); col++) {
                 GridCell cell = getCell(row, col);
                 if (!cell.isEmpty() && cell.getContent().contains(entity)) {
-                    return new int[] { row, col };
+                    return cell;
+                }
+            }
+        }
+        throw new IllegalArgumentException("Entity not found on the grid.");
+    }
+    public int[] getLocationCords(GridCell cellTarget) {
+        for (int row = 0; row < getLength(); row++) {
+            for (int col = 0; col < getWidth(); col++) {
+                GridCell cell = getCell(row, col);
+                if (cell==cellTarget) {
+                    return new int[]{row, col};
+                }
+            }
+        }
+        throw new IllegalArgumentException("Entity not found on the grid.");
+    }
+    public int[] getLocationCords(Entity e) {
+        GridCell cellTarget = getLocation(e);
+        for (int row = 0; row < getLength(); row++) {
+            for (int col = 0; col < getWidth(); col++) {
+                GridCell cell = getCell(row, col);
+                if (cell==cellTarget) {
+                    return new int[]{row, col};
                 }
             }
         }
@@ -112,8 +170,33 @@ public abstract class GridState implements State {
         }
         return; // Entity not found, do nothing
     }
+    public void removeEntity(Entity entity) {
+        GridCell cell = getLocation(entity);
+        if (!cell.isEmpty() && cell.getContent().contains(entity)) {
+            cell.removeContent();
+            return;
+        }
+        return; // Entity not found, do nothing
+    }
 
     public int getDistance(int[] pos1, int[] pos2) {
         return Math.abs(pos1[0] - pos2[0]) + Math.abs(pos1[1] - pos2[1]);
     }
+    public int getDistance(GridCell c1, GridCell c2) {
+        int[] pos1 = getLocationCords(c1);
+        int[] pos2 = getLocationCords(c2);
+        return Math.abs(pos1[0] - pos2[0]) + Math.abs(pos1[1] - pos2[1]);
+    }
+    public GridCell getCellAdjacent(Entity reference, char direction){
+        int[] init = getLocationCords(getLocation(reference));
+        switch (direction){
+            case 'e' -> init[1]+=1;
+            case 'w' -> init[1]-=1;
+            case 's' -> init[0]+=1;
+            case 'n' -> init[0]-=1;
+            default -> throw new IllegalStateException("Unexpected direction: " + direction);
+        }
+        return getCell(init[0], init[1]);
+    }
+
 }

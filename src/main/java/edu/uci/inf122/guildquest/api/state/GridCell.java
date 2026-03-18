@@ -20,7 +20,9 @@ public class GridCell {
     }
 
     public boolean hasContent() {
-        return content != null;
+        if (content==null) return false;
+        else if (content.isEmpty()) return false;
+        else return true;
     }
 
     public List<Entity> getContent() {

@@ -76,4 +76,7 @@ public abstract class PlayableCharacter extends Entity {
         throw new UnsupportedOperationException(
                 getClass().getSimpleName() + " does not implement attack(Entity) yet.");
     }
+    public boolean isDead(){
+        return health.getHealth()<=0;
+    }
 }

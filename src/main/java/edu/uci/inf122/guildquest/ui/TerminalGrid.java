@@ -15,6 +15,9 @@ public class TerminalGrid extends GridState {
 
     @Override
     public void render() {
+        out.print(getGridStr());
+    }
+    public String getGridStr(){
         int longestNameLen=0;
         for (List<GridCell> row : grid){
             if (row==null) continue;
@@ -27,22 +30,28 @@ public class TerminalGrid extends GridState {
         int leftPad;
         int rightPad;
         int padding;
+        StringBuilder res = new StringBuilder();
+        res.append("-".repeat((longestNameLen+4)*grid.size())).append('\n');
         for (List<GridCell> row : grid){
             if (row==null) continue;
             for (GridCell cell : row){
                 if (cell.isEmpty()) {
-                    out.print("|"+" ".repeat(longestNameLen+2)+"|");
+                    res.append("|").append(" ".repeat(longestNameLen + 2)).append("|");
                     continue;
                 }
                 padding = longestNameLen - cell.getContent().get(cell.getContent().size()-1).getName().length();
                 leftPad = padding / 2;
                 rightPad = padding - leftPad;
-                out.print("| "+" ".repeat(leftPad)+
-                        cell.getContent().get(cell.getContent().size()-1).getName()
-                        +" ".repeat(rightPad)+" |");
+                res.append("| ")
+                        .append(" ".repeat(leftPad))
+                        .append(cell.getContent().get(cell.getContent().size() - 1).getName())
+                        .append(" ".repeat(rightPad))
+                        .append(" |");
             }
-            out.print('\n');
+            res.append('\n');
         }
+        res.append("-".repeat((longestNameLen+4)*grid.size())).append('\n');
+        return res.toString();
     }
 
     @Override

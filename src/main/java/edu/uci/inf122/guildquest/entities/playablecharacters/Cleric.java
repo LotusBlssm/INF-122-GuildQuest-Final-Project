@@ -1,5 +1,6 @@
 package edu.uci.inf122.guildquest.entities.playablecharacters;
 
+import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 
 public class Cleric extends PlayableCharacter {
@@ -45,5 +46,8 @@ public class Cleric extends PlayableCharacter {
     public void heal(Amount amount, PlayableCharacter target) {
         target.heal(amount);
         System.out.println(getName() + " heals " + target.getName() + " for " + amount.getCount() + " health.");
+    }
+    public void attack(Entity target){
+        System.out.println("Clerics are pacifists, and cannot attack");
     }
 }

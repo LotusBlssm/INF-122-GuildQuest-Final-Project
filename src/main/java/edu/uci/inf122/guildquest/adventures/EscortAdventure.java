@@ -1,6 +1,7 @@
 package edu.uci.inf122.guildquest.adventures;
 
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
+import edu.uci.inf122.guildquest.api.state.GridCell;
 import edu.uci.inf122.guildquest.api.state.State;
 import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
 import edu.uci.inf122.guildquest.content.*;
@@ -76,6 +77,15 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     private List<Entity> items;
     private List<Entity> npcs;
     private final static Page page = Page.getPage();
+    private PlayableCharacter currentPlayer;
+    private final static String CHOICES_PROMPT= """
+            Move:  North (n), South (s), East (e), West (w)
+            Attack: North (n), South (s), East (e), West (w)
+            Request Hint From Ferryman (r)
+            
+            Example valid input: (move n), (attack s), (r)
+            """;
+    private final static String CHOICES_REGEX= "((move|attack) [nsew])|r";
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
@@ -97,59 +107,66 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
 
         initializeUser(); // set up who's with the NPC, etc. if we want to ask
         initializeGrid();
+        gridState.render();
         while (true) {
-            // render the grid state
-            gridState.render();
 
             // accept player input
-            acceptInput();
+            playerTurns(); // will render
+            enemyTurn();
             // advance the game state
+            advanceCycle();
             // in the case the game should end after accepting input
             if (checkRunningCondition()) {
                 break;
             }
-            advanceCycle();
+
             // check win conditions and update gameRunning accordingly
-            break;
 
         }
     }
 
-    public void acceptInput() {
-        // handle player input: moving the player, attacking enemies
-
-        // Players:
-        // - attack
-        // - move
-        // - ask NPC for hints
+    /**
+     * Accepts input and acts for player 1 and player 2
+     * Can attack, move, or ask NPC for hints
+     */
+    public void playerTurns() {
 
         // before the player choose the move (move or attack), the NPC with them can
         // give them the fact if there ar enemies around them (2 spaces away in any
         // direction).
 
-        int currentPlayer = 0;
-        while (currentPlayer < 1) {
-            int choice = 1; // placeholder for player input
-            switch (choice) {
-                case 1 -> {
-                    // move logic
-                    makeMove(currentPlayer);
-                    currentPlayer += 1;
-                }
-                case 2 -> {
-                    // attack logic
-                    makeAttack(currentPlayer);
-                    currentPlayer += 1;
-                }
-                case 3 -> {
-                    // ask for hints
-                    makeHintRequest();
-                    currentPlayer += 1;
-                }
-                default -> {
-                    // prompt player for valid input
+        // unsure what we mean by "the NPC with them"
+
+        // String npcHint = nearbyNPC.speak();
+        // String prompt = gridState.getGridStr()+npcHint+CHOICES_PROMPT
+        boolean done = false;
+        currentPlayer=player1;
+        while (!done){
+            String input = page.acceptStrUntil(currentPlayer.getName()+ "'s turn!\n"+CHOICES_PROMPT, CHOICES_REGEX);
+            GridCell targetCell = gridState.getLocation(currentPlayer);
+            if (input.contains("move")){
+                if (gridState.canMove(currentPlayer, input.charAt(input.length()-1))){
+                    attemptMovePlayer(currentPlayer, input.charAt(input.length()-1));
+                } else{
+                    page.print("Cannot move into that square\n\n");
+                    continue;
                 }
             }
+            else if (input.contains("attack")){
+                GridCell attackTarget = gridState.getCellAdjacent(currentPlayer, input.charAt(input.length()-1));
+                if (attackTarget.isEmpty() ||
+                        ! (attackTarget.getContent().get(0) instanceof Hostile)){
+                    page.print("Cannot attack that cell\n\n");
+                    continue;
+                }
+                attemptPlayerAttack(currentPlayer, input.charAt(input.length()-1));
+            }
+            else if (input.equals("r")){
+                makeHintRequest(); // check to see if npc is nearby
+            } else throw new IllegalStateException("Something went wrong with input, cannot parse");
+            gridState.render();
+            if (currentPlayer==player1) currentPlayer=player2;
+            else done=true;
         }
         // if (player location is within 2 spaces of the destination) {
         // // give clear hints about the destination (ex: steps)
@@ -160,33 +177,6 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // // if the enemy attacks the player, the player will know the enemy's
         // location.
 
-        // // move logic: psuedocode for now
-        // if (move) {
-        // // logic to accept input for each player character
-
-        // // moving logic: (take out later)
-        // int moveRow = 4; // placeholder for player input
-        // int moveCol = 4; // placeholder for player input
-        // while (Math.abs(moveRow) + Math.abs(moveCol) > 3 || Math.abs(moveRow) +
-        // Math.abs(moveCol) == 0) {
-        // // prompt player for valid input
-        // // update moveRow and moveCol based on player input
-
-        // // get move values from player input (for now, we will just use placeholders,
-        // // but we will need to implement actual input handling later)
-        // moveRow = 2;
-        // moveCol = 1;
-        // if (gridState.isValidPosition(moveRow, moveCol)) {
-        // // move the player character on the grid
-        // // for now, we will just set the new position of the player character on the
-        // // grid
-        // // but we will need to update the player's actual position in the game state
-        // // later
-        // gridState.setCell(moveRow, moveCol, character.getName());
-        // } else {
-        // // prompt player for valid input
-        // }
-        // }
         // check if the player with the NPC is on the same grid cell as an enemy, if so,
         // end the game with a loss
         // if there is an NPC or Items, then interact with them (ex: pick up items, get
@@ -213,7 +203,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // ask the player for the direction (since they don't know the enemy's location,
         // they only know there is an enemy near them (within 2 spaces))
         // if the user choice (direction) is correct, then the attack is successful and
-        // the enemies take damage
+        // the enemies take
+
         // player can choose: up, down, left, right
         // the attack is applied to all the enemies in that direction within 2 spaces
 
@@ -232,7 +223,34 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // - attack player if adjacent to player with NPC
         // - if the player attacked them, the enemy can attack the player back during
         // their turn
+    }
+    public void acceptInput(){
 
+    }
+
+    private void attemptPlayerAttack(PlayableCharacter p, char direction) {
+        int[] target = gridState.getLocationCords(gridState.getLocation(p));
+        switch (direction){
+            case 'e' -> target[1]+=1;
+            case 'w' -> target[1]-=1;
+            case 's' -> target[0]+=1;
+            case 'n' -> target[0]-=1;
+            default -> throw new IllegalStateException("Unexpected direction: " + direction);
+        }
+        GridCell targetCell = gridState.getCell(target[0], target[1]);
+        if (p instanceof Cleric){
+
+        } else{
+
+        }
+        p.attack(targetCell.getContent().get(0)); // assume only on 1st layer
+        if (targetCell.getContent().get(0) instanceof Goblin g){
+            if (g.isDead()){
+                gridState.removeEntity(g);
+                enemies.remove(g);
+                gridState.render();
+            }
+        }
     }
 
     // enemy turn logic: psuedocode for now
@@ -254,22 +272,23 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // check if the enemy is within 2 spaces of the player with the NPC
         // if so, attack the players
         // else, skip the enemy's turn for now
-        int[] player1Position = gridState.getLocation(this.player1);
-        int[] player2Position = gridState.getLocation(this.player2);
+        GridCell player1Position = gridState.getLocation(this.player1);
+        GridCell player2Position = gridState.getLocation(this.player2);
         for (Entity enemy : enemies) {
             if (enemy instanceof Goblin goblinEnemy) {
-                int[] enemyPosition = gridState.getLocation(enemy);
+                GridCell enemyPosition = gridState.getLocation(enemy);
                 if (gridState.getDistance(player1Position, enemyPosition) <= 2) {
                     goblinEnemy.attack(player1);
                 }
                 if (gridState.getDistance(player2Position, enemyPosition) <= 2) {
                     goblinEnemy.attack(player2);
                 }
-                break; // only one enemy can attack per turn
+//                break; // only one enemy can attack per turn
                 // TODO: add more concrete logic for enemy attacks (ex: prioritize an enemy who
                 // can attack many players)
             }
         }
+
 
     }
 
@@ -352,17 +371,37 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 1 - Cleric
                 """, 1);
         if (p1Choice == 1) {
-            player1 = Cleric.getInstance(new Name("Player 1")); // placeholder
-            player2 = Assassin.getInstance(new Name("Player 2"));
-            page.print("Player 1 is the assassin, player 2 is the cleric\n");
+            player1 = Cleric.getInstance(new Name("Cleric")); // placeholder
+            player2 = Assassin.getInstance(new Name("Assassin"));
+            page.print("Player 1 is the Cleric, player 2 is the Assassin\n");
         } else {
             player1 = Assassin.getInstance(new Name("Assassin")); // placeholder
             player2 = Cleric.getInstance(new Name("Cleric"));
-            page.print("Player 1 is the assassin, player 2 is the cleric\n");
+            page.print("Player 1 is the Assassin, player 2 is the Cleric\n");
         }
+        currentPlayer=player1;
 
     }
 
+    /**
+     * Moves the player in the direction desired.
+     *
+     * @param p         the p
+     * @param direction the direction
+     */
+    public void attemptMovePlayer(PlayableCharacter p, char direction){
+        int[] target = gridState.getLocationCords(gridState.getLocation(p));
+        gridState.removeEntity(p);
+        switch (direction){
+            case 'e' -> target[1]+=1;
+            case 'w' -> target[1]-=1;
+            case 's' -> target[0]+=1;
+            case 'n' -> target[0]-=1;
+            default -> throw new IllegalStateException("Unexpected direction: " + direction);
+        }
+        GridCell targetCell = gridState.getCell(target[0], target[1]);
+        gridState.setCellWithChecking(targetCell, p);
+    }
     // player action logic: move, attack, ask for hints
     public void makeMove(int playerNumber) {
         // logic to let the player make move choices
@@ -415,7 +454,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             }
         }
         // step2: collect all the enemies in the chosen direction within 2 spaces
-        int[] playerPosition = gridState.getLocation(currentPlayer == 0 ? player1 : player2);
+        int[] playerPosition = gridState.getLocationCords(currentPlayer == 0 ? player1 : player2);
         List<Entity> enemiesToAttack = new ArrayList<>();
         for (int i = 1; i <= 2; i++) {
             int newRow = playerPosition[0] + (y == 0 ? 0 : i * (y / Math.abs(y)));
@@ -438,7 +477,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 }
                 // if the enemy is defeated, remove it from the grid and let the player know
                 if (goblinEnemy.getHealth().getHealth() <= 0) { // chain..!
-                    int[] enemyPosition = gridState.getLocation(goblinEnemy);
+                    int[] enemyPosition = gridState.getLocationCords(goblinEnemy);
                     gridState.removeEntity(enemyPosition[0], enemyPosition[1], goblinEnemy);
                     page.print("You defeated an enemy!\n");
                 }
@@ -452,7 +491,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // logic to let the player ask for hints
 
         // check the distance between the player with the NPC and the destination
-        int[] playerPosition = gridState.getLocation(player1);
+        int[] playerPosition = gridState.getLocationCords(player1);
         if (gridState.checkDistance(playerPosition[0], playerPosition[1], 2)) {
             // give clear hints about the destination (ex: steps)
             // tell drirection
@@ -463,9 +502,9 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     }
 
     public boolean checkRunningCondition() {
-        // logic to check if the adventure should continue running
-        // check win conditions and lose conditions
-        return false; // placeholder
+        // learn to use actual WinConditoin object here.
+        if (player1.isDead() || player2.isDead()) return true;
+        else return false;
     }
 
     public static void main(String[] args) {
