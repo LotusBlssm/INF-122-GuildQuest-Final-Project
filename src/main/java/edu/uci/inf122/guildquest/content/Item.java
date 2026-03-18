@@ -30,4 +30,12 @@ public abstract class Item {
     public String getDescription() {
         return description;
     }
+
+    public boolean isUsable() {
+        return false;
+    }
+
+    public String getItemType() {
+        return "Item";
+    }
 }
