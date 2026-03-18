@@ -4,6 +4,8 @@ import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 
+import java.util.List;
+
 import static edu.uci.inf122.guildquest.ui.UserUI.page;
 
 public class Goblin extends NPC implements Hostile {
@@ -61,4 +63,5 @@ public class Goblin extends NPC implements Hostile {
     public void warCry() {
         page.print("GARBLE GARBLE");
     }
+
 }

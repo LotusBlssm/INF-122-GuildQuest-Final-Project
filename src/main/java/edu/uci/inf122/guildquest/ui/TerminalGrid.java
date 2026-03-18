@@ -2,6 +2,7 @@ package edu.uci.inf122.guildquest.ui;
 
 import edu.uci.inf122.guildquest.api.state.GridCell;
 import edu.uci.inf122.guildquest.api.state.GridState;
+import edu.uci.inf122.guildquest.entities.playablecharacters.Move;
 
 import java.util.List;
 
@@ -57,5 +58,38 @@ public class TerminalGrid extends GridState {
     @Override
     public void changeState() {
 
+    }
+
+    public static String toOptions(List<Move.ValidMoves> moves) {
+        StringBuilder res = new StringBuilder();
+        for (Move.ValidMoves m : moves){
+            switch (m){
+                case ATTACK -> res.append("Attack: North (n), South (s), East (e), West (w)\n");
+                case TRAVEL -> res.append("Move: North (n), South (s), East (e), West (w)\n");
+                case HEAL_OTHER -> res.append("Heal other: North (n), South (s), East (e), West (w)\n");
+                case HEAL_SELF -> res.append("Heal self: (heal self)\n");
+                case TAKE_ITEM -> res.append("Take Item: North (n), South (s), East (e), West (w)\n");
+                case USE_ITEM -> res.append("Use Item: (use item)\n");
+                case REQUEST_HINT -> res.append("Request Hint: (r)\n");
+            }
+        }
+        return res.toString();
+    }
+    public static String toOptionsRegex(List<Move.ValidMoves> moves) {
+        StringBuilder res = new StringBuilder();
+        for (Move.ValidMoves m : moves){
+            switch (m){
+                case ATTACK -> res.append("(attack [nsew])");
+                case TRAVEL -> res.append("(move [nsew])");
+                case HEAL_OTHER -> res.append("(heal [nsew])");
+                case HEAL_SELF -> res.append("(heal self)");
+                case TAKE_ITEM -> res.append("(take item [nsew])");
+                case USE_ITEM -> res.append("(use item)");
+                case REQUEST_HINT -> res.append("(r)");
+            }
+            res.append('|');
+        }
+        res.deleteCharAt(res.length()-1);
+        return res.toString();
     }
 }

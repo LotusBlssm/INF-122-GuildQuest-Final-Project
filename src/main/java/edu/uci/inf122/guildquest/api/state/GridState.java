@@ -2,6 +2,7 @@ package edu.uci.inf122.guildquest.api.state;
 
 import edu.uci.inf122.guildquest.entities.Entity;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,8 +68,7 @@ public abstract class GridState implements State {
     /**
      * Moves an entity into a cell at row, col, IF it is empty.
      *
-     * @param row the row
-     * @param col the col
+     * @param targetCell the targetcell
      * @param e   the entity
      * @return whether operation succeeded or not
      */
@@ -163,12 +163,7 @@ public abstract class GridState implements State {
     }
 
     public void removeEntity(int row, int col, Entity entity) {
-        GridCell cell = getCell(row, col);
-        if (!cell.isEmpty() && cell.getContent().contains(entity)) {
-            cell.removeContent();
-            return;
-        }
-        return; // Entity not found, do nothing
+        removeEntity(entity);
     }
     public void removeEntity(Entity entity) {
         GridCell cell = getLocation(entity);
@@ -197,6 +192,31 @@ public abstract class GridState implements State {
             default -> throw new IllegalStateException("Unexpected direction: " + direction);
         }
         return getCell(init[0], init[1]);
+    }
+
+    /**
+     * Nearby entities list in a diamond shaped pattern.
+     *
+     * @param center the center
+     * @param range  the range
+     * @return the list
+     */
+    public List<Entity> nearbyEntities(GridCell center, int range){
+        ArrayList<Entity> entities = new ArrayList<>();
+        int[] pos = getLocationCords(center);
+        int centerX = pos[0];
+        int centerY = pos[1];
+        for (int y = centerY - range; y <= centerY + range; y++) {
+            for (int x = centerX - range; x <= centerX + range; x++) {
+                if (Math.abs(x - centerX) + Math.abs(y - centerY) <= range) {
+                    if (isValidPosition(x, y) && getCell(x, y).hasContent()) {
+                        entities.addAll(getCell(x, y).getContent());
+                    }
+                }
+            }
+        }
+        entities.remove(center.getContent().get(0));
+        return entities;
     }
 
 }

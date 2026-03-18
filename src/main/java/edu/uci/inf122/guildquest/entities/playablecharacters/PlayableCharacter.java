@@ -5,11 +5,14 @@ import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.npcs.NPC;
 
+import java.util.List;
+
 public abstract class PlayableCharacter extends Entity {
     private Health health;
     private final Level level;
     private final CharacterClass characterClass;
     private final Inventory inventory;
+    private static final List<Move.ValidMoves> moves=List.of();
 
     private final WithPrincess withPrincess;
 
@@ -86,4 +89,7 @@ public abstract class PlayableCharacter extends Entity {
     public WithPrincess getWithPrincess() {
         return withPrincess;
     }
+
+    public abstract List<Move.ValidMoves> getMoves();
+
 }

@@ -3,10 +3,14 @@ package edu.uci.inf122.guildquest.entities.playablecharacters;
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 
+import java.util.List;
+
 public class Cleric extends PlayableCharacter {
     private static Cleric instance;
     
     private final DecimalAmount healingPower;
+    private static final List<Move.ValidMoves> moves = List.of(Move.ValidMoves.TRAVEL, Move.ValidMoves.HEAL_OTHER,
+        Move.ValidMoves.HEAL_SELF, Move.ValidMoves.REQUEST_HINT);
 
     protected Cleric(Name name) {
         super(name, new Health(90), new Level(1), new CharacterClass("Cleric"));
@@ -53,5 +57,9 @@ public class Cleric extends PlayableCharacter {
 
     public DecimalAmount getHealingPower() {
         return healingPower;
+    }
+    @Override
+    public List<Move.ValidMoves> getMoves(){
+        return moves;
     }
 }

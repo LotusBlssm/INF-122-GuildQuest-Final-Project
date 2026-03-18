@@ -2,13 +2,17 @@ package edu.uci.inf122.guildquest.entities.playablecharacters;
 
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
-import edu.uci.inf122.guildquest.entities.interfaces.CanAttack;
+import edu.uci.inf122.guildquest.entities.interfaces.AttackMove;
+import edu.uci.inf122.guildquest.entities.interfaces.CardinalTravelMove;
+import edu.uci.inf122.guildquest.ui.TerminalGrid;
 
-public class Assassin extends PlayableCharacter implements CanAttack {
+import java.util.List;
+
+public class Assassin extends PlayableCharacter implements AttackMove, CardinalTravelMove {
     private static Assassin instance;
-
     private final DecimalAmount criticalHitChance;
     private final Amount attackPower;
+    private static final List<ValidMoves> moves = List.of(ValidMoves.TRAVEL, ValidMoves.ATTACK, ValidMoves.REQUEST_HINT);
 
     private Assassin(Name name) {
         super(name, new Health(80), new Level(1), new CharacterClass(new Name("Assassin")));
@@ -67,5 +71,11 @@ public class Assassin extends PlayableCharacter implements CanAttack {
 
     public Amount getAttackPower() {
         return attackPower;
+    }
+    @Override
+    public void execute(TerminalGrid state, ValidMoves move) {
+    }
+    public List<Move.ValidMoves> getMoves(){
+        return moves;
     }
 }
