@@ -5,11 +5,13 @@ import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.npcs.NPC;
 
-public abstract class PlayableCharacter extends Entity {
+public abstract class PlayableCharacter extends Entity{
     private Health health;
     private final Level level;
     private final CharacterClass characterClass;
     private final Inventory inventory;
+
+    private final WithPrincess withPrincess;
 
     public PlayableCharacter(Name name, Health health, Level level, CharacterClass characterClass) {
         this.name = name;
@@ -17,6 +19,7 @@ public abstract class PlayableCharacter extends Entity {
         this.level = level;
         this.characterClass = characterClass;
         this.inventory = new Inventory();
+        this.withPrincess = new WithPrincess(false);
     }
 
     @Override
@@ -71,5 +74,9 @@ public abstract class PlayableCharacter extends Entity {
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public WithPrincess getWithPrincess() {
+        return withPrincess;
     }
 }

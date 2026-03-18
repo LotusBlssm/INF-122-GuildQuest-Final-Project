@@ -53,4 +53,22 @@ public class Knight extends PlayableCharacter implements CanAttack {
     public void attack(Entity target) {
         dealDamage(target, new Damage(attackPower));
     }
+
+    public DecimalAmount getDamageReductionMultiplier() {
+        return damageReductionMultiplier;
+    }
+
+    public DecimalAmount getDamageReductionDisplay() {
+        DecimalAmount reduction = new DecimalAmount(1 - damageReductionMultiplier.getCount());
+        reduction = reduction.multiply(100);
+        return reduction;
+    }
+
+    public DecimalAmount getHealingMultiplier() {
+        return healingMultiplier;
+    }
+
+    public Amount getAttackPower() {
+        return attackPower;
+    }
 }

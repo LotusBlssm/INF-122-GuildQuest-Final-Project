@@ -46,4 +46,8 @@ public class Cleric extends PlayableCharacter {
         target.heal(amount);
         System.out.println(getName() + " heals " + target.getName() + " for " + amount.getCount() + " health.");
     }
+
+    public DecimalAmount getHealingPower() {
+        return healingPower;
+    }
 }

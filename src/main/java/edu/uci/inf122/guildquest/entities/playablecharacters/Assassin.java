@@ -55,4 +55,17 @@ public class Assassin extends PlayableCharacter implements CanAttack {
         }
         dealDamage(target, modified);
     }
+
+    public DecimalAmount getCriticalHitChance() {
+        return criticalHitChance;
+    }
+
+    public DecimalAmount getCriticalHitChanceDisplay() {
+        DecimalAmount display = criticalHitChance.multiply(100);
+        return display;
+    }
+
+    public Amount getAttackPower() {
+        return attackPower;
+    }
 }
