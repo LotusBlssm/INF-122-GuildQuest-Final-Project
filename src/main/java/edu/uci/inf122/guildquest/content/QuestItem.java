@@ -13,4 +13,14 @@ public class QuestItem extends Item {
     public QuestEvent getQuestAssociated() {
         return questAssociated;
     }
+
+    @Override
+    public boolean isUsable() {
+        return false;
+    }
+
+    @Override
+    public String getItemType() {
+        return "QuestItem";
+    }
 }
