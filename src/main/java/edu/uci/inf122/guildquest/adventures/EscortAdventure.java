@@ -2,7 +2,6 @@ package edu.uci.inf122.guildquest.adventures;
 
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
 import edu.uci.inf122.guildquest.api.state.GridCell;
-import edu.uci.inf122.guildquest.api.state.State;
 import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
 import edu.uci.inf122.guildquest.content.*;
 
@@ -12,9 +11,10 @@ import java.util.List;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 // import edu.uci.inf122.guildquest.ui;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
-import edu.uci.inf122.guildquest.api.state.GridState;
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
+import edu.uci.inf122.guildquest.entities.interfaces.CanHealOther;
+import edu.uci.inf122.guildquest.entities.interfaces.CanHealSelf;
 import edu.uci.inf122.guildquest.entities.npcs.*;
 import edu.uci.inf122.guildquest.entities.playablecharacters.Assassin;
 import edu.uci.inf122.guildquest.entities.playablecharacters.Cleric;
@@ -25,8 +25,6 @@ import edu.uci.inf122.guildquest.ui.TerminalGrid;
 import edu.uci.inf122.guildquest.ui.playablecharacteruis.AssassinUI;
 import edu.uci.inf122.guildquest.ui.playablecharacteruis.ClericUI;
 import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
-
-import java.util.UUID;
 
 // The rule: 
 // starting point: (0, 0) with an NPC that needs to be escorted to the destination that the NPC knows. (The player does not know the destination)
@@ -160,6 +158,12 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             else if (input.contains("attack")){
                 if (! attemptPlayerAttack(currentPlayer, input.charAt(input.length()-1)) ) continue;
             }
+            else if (input.contains("heal self")){
+                if (! attemptPlayerHealSelf(currentPlayer)) continue;
+            }
+            else if (input.contains("heal")){
+                if (! attemptPlayerHealOther(currentPlayer,input.charAt(input.length()-1)) ) continue;
+            }
             else if (input.equals("r")){
                 if ( ! makeHintRequest() ) continue; // check to see if npc is nearby
             } else throw new IllegalStateException("Something went wrong with input, cannot parse");
@@ -223,6 +227,69 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // - if the player attacked them, the enemy can attack the player back during
         // their turn
     }
+
+    private boolean attemptPlayerHealSelf(PlayableCharacter p) {
+        if (p instanceof CanHealSelf healer){
+            if (p.isDead()){
+                page.print("You cannot heal yourself. You're dead!\n");
+                return false;
+            }
+            if (p.getHealth().isFull()){
+                page.print("You're already at full health! Nothing to heal :)\n");
+                return false;
+            }
+            if (p instanceof Cleric c){
+                c.heal(c.getHealingPower());
+                page.print(c.getName() + " healed to " + c.getHealth() + '\n');
+                return true;
+            }
+            throw new IllegalStateException("Error in PlayerHeal, something went wrong");
+        } else{
+            page.print("This character cannot heal\n");
+            return false;
+        }
+    }
+
+    private boolean attemptPlayerHealOther(PlayableCharacter p, char direction) {
+        if (p instanceof CanHealOther healer){
+            if (p.isDead()){
+                page.print("You cannot heal others. You're dead!\n");
+                return false;
+            }
+            if (gridState.isValidAdjacent(p, direction)){
+                GridCell targetCell = gridState.getCellAdjacent(p, direction);
+                if (! targetCell.isEmpty()){
+                    Entity target = targetCell.getContent().get(0);
+                    if (target instanceof PlayableCharacter otherPlayer){
+                        if (otherPlayer.getHealth().isFull()){
+                            page.print("Already at full health. Do something else.\n");
+                            return false;
+                        }
+                        else{
+                            healer.heal(healer.getHealAmount(), otherPlayer);
+                            return true;
+                        }
+                    }
+                    else{
+                        page.print("can only heal other players for now.\n");
+                        return false;
+                    }
+                }
+                else{
+                    page.print("Target cell is empty, cannot heal here\n");
+                    return false;
+                }
+            }
+            else{
+                page.print("You cannot heal in that direction\n");
+                return false;
+            }
+        } else{
+            page.print("This character cannot others!\n");
+            return false;
+        }
+    }
+
     public void acceptInput(){
 
     }

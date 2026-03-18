@@ -1,6 +1,7 @@
 package edu.uci.inf122.guildquest.api.state;
 
 import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -219,4 +220,15 @@ public abstract class GridState implements State {
         return entities;
     }
 
+    public boolean isValidAdjacent(PlayableCharacter p, char direction) {
+        int pos[] = getLocationCords(p);
+        switch (direction){
+            case 'e' -> pos[1]+=1;
+            case 'w' -> pos[1]-=1;
+            case 's' -> pos[0]+=1;
+            case 'n' -> pos[0]-=1;
+            default -> throw new IllegalStateException("Unexpected direction: " + direction);
+        }
+        return isValidPosition(pos[0], pos[1]);
+    }
 }

@@ -19,4 +19,8 @@ public class DecimalAmount {
     public DecimalAmount subtract(int c){
         return new DecimalAmount(count-c);
     }
+
+    public Amount toAmount(){
+        return new Amount((int)count);
+    }
 }

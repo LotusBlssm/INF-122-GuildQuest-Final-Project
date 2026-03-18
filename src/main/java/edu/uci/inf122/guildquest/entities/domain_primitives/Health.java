@@ -75,4 +75,8 @@ public class Health {
     public String toString() {
         return Integer.toString(health);
     }
+
+    public boolean isFull() {
+        return health==capacity;
+    }
 }

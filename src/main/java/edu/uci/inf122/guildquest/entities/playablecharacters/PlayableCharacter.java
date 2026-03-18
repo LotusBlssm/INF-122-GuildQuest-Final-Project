@@ -39,10 +39,10 @@ public abstract class PlayableCharacter extends Entity {
      *
      * @param amount the amount to heal by.
      */
-    protected void heal(Amount amount) {
+    public void heal(Amount amount) {
         health.increaseBy(amount);
     }
-    protected void heal(DecimalAmount amount) {
+    public void heal(DecimalAmount amount) {
         health.increaseBy(amount);
     }
 
