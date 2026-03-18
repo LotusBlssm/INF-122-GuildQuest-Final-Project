@@ -50,4 +50,8 @@ public class Cleric extends PlayableCharacter {
     public void attack(Entity target){
         System.out.println("Clerics are pacifists, and cannot attack");
     }
+
+    public DecimalAmount getHealingPower() {
+        return healingPower;
+    }
 }

@@ -15,4 +15,8 @@ public class DecimalAmount {
     public DecimalAmount multiply(int c){
         return new DecimalAmount(count*c);
     }
+
+    public DecimalAmount subtract(int c){
+        return new DecimalAmount(count-c);
+    }
 }

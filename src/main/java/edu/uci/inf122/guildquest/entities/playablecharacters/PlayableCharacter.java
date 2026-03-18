@@ -11,12 +11,15 @@ public abstract class PlayableCharacter extends Entity {
     private final CharacterClass characterClass;
     private final Inventory inventory;
 
+    private final WithPrincess withPrincess;
+
     public PlayableCharacter(Name name, Health health, Level level, CharacterClass characterClass) {
         super(name);
         this.health = health;
         this.level = level;
         this.characterClass = characterClass;
         this.inventory = new Inventory();
+        this.withPrincess = new WithPrincess(false);
     }
 
     @Override
@@ -36,7 +39,6 @@ public abstract class PlayableCharacter extends Entity {
     protected void heal(Amount amount) {
         health.increaseBy(amount);
     }
-
     protected void heal(DecimalAmount amount) {
         health.increaseBy(amount);
     }
@@ -51,7 +53,8 @@ public abstract class PlayableCharacter extends Entity {
             if (target instanceof NPC npcTarget) {
                 npcTarget.takeDamage(damage);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.out.println("An error occurred while trying to deal damage: " + e.getMessage());
         }
     }
@@ -78,5 +81,9 @@ public abstract class PlayableCharacter extends Entity {
     }
     public boolean isDead(){
         return health.getHealth()<=0;
+    }
+
+    public WithPrincess getWithPrincess() {
+        return withPrincess;
     }
 }

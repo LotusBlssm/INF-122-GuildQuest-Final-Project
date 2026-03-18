@@ -21,6 +21,9 @@ import edu.uci.inf122.guildquest.entities.playablecharacters.Cleric;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 import edu.uci.inf122.guildquest.ui.Page;
 import edu.uci.inf122.guildquest.ui.TerminalGrid;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.AssassinUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.ClericUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
 
 import java.util.UUID;
 
@@ -370,15 +373,25 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 0 - Assassin
                 1 - Cleric
                 """, 1);
+        PlayableCharacterUI p1UI;
+        PlayableCharacterUI p2UI;
+        Cleric c = Cleric.getInstance(new Name("Cleric"));
+        Assassin a = Assassin.getInstance(new Name("Assassin"));
         if (p1Choice == 1) {
-            player1 = Cleric.getInstance(new Name("Cleric")); // placeholder
-            player2 = Assassin.getInstance(new Name("Assassin"));
+            player1 = c;
+            player2 = a;
+            p1UI = new ClericUI(c);
+            p2UI = new AssassinUI(a);
             page.print("Player 1 is the Cleric, player 2 is the Assassin\n");
         } else {
-            player1 = Assassin.getInstance(new Name("Assassin")); // placeholder
-            player2 = Cleric.getInstance(new Name("Cleric"));
+            player1 = a;
+            player2 = c;
+            p1UI = new AssassinUI(a);
+            p2UI = new ClericUI(c);
             page.print("Player 1 is the Assassin, player 2 is the Cleric\n");
         }
+        p1UI.display();
+        p2UI.display();
         currentPlayer=player1;
 
     }

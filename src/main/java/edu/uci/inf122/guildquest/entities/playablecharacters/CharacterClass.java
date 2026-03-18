@@ -10,4 +10,8 @@ public class CharacterClass {
     public CharacterClass(String name){
         this.name = new Name(name);
     }
+
+    public Name getName() {
+        return name;
+    }
 }

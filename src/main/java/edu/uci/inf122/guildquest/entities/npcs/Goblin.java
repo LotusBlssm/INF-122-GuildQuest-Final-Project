@@ -33,11 +33,13 @@ public class Goblin extends NPC implements Hostile {
         Damage damage = new Damage(Math.max(1, attackPower));
 
         if (target instanceof PlayableCharacter playableTarget) {
+            System.out.println(name+" attacks!");
             playableTarget.takeDamage(damage);
             return;
         }
 
         if (target instanceof NPC npcTarget) {
+            System.out.println(name+" attacks!");
             npcTarget.takeDamage(damage);
             return;
         }

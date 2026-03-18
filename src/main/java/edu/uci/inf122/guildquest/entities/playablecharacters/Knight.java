@@ -4,6 +4,8 @@ import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.interfaces.CanAttack;
 
+import java.util.DoubleSummaryStatistics;
+
 public class Knight extends PlayableCharacter implements CanAttack {
     private static Knight instance;
 
@@ -52,5 +54,27 @@ public class Knight extends PlayableCharacter implements CanAttack {
     @Override
     public void attack(Entity target) {
         dealDamage(target, new Damage(attackPower));
+    }
+
+    public DecimalAmount getDamageReductionMultiplier() {
+        return damageReductionMultiplier;
+    }
+
+    public DecimalAmount getDamageReductionDisplay() {
+        DecimalAmount reduction = new DecimalAmount(1 - damageReductionMultiplier.getCount());
+        reduction = reduction.multiply(100);
+        return reduction;
+    }
+
+    public DecimalAmount getHealingMultiplier() {
+        return healingMultiplier;
+    }
+
+    public Amount getAttackPower() {
+        return attackPower;
+    }
+
+    public DecimalAmount getDamageReductionMultiplierDisplay() {
+        return damageReductionMultiplier;
     }
 }
