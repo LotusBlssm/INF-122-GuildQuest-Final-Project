@@ -4,6 +4,7 @@ import edu.uci.inf122.guildquest.content.Inventory;
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.npcs.NPC;
+import edu.uci.inf122.guildquest.content.Item;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public abstract class PlayableCharacter extends Entity {
     private final Level level;
     private final CharacterClass characterClass;
     private final Inventory inventory;
-    private static final List<Move.ValidMoves> moves=List.of();
+    private static final List<Move.ValidMoves> moves = List.of();
 
     private final WithPrincess withPrincess;
 
@@ -42,6 +43,7 @@ public abstract class PlayableCharacter extends Entity {
     public void heal(Amount amount) {
         health.increaseBy(amount);
     }
+
     public void heal(DecimalAmount amount) {
         health.increaseBy(amount);
     }
@@ -56,8 +58,7 @@ public abstract class PlayableCharacter extends Entity {
             if (target instanceof NPC npcTarget) {
                 npcTarget.takeDamage(damage);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("An error occurred while trying to deal damage: " + e.getMessage());
         }
     }
@@ -82,8 +83,9 @@ public abstract class PlayableCharacter extends Entity {
         throw new UnsupportedOperationException(
                 getClass().getSimpleName() + " does not implement attack(Entity) yet.");
     }
-    public boolean isDead(){
-        return health.getHealth()<=0;
+
+    public boolean isDead() {
+        return health.getHealth() <= 0;
     }
 
     public WithPrincess getWithPrincess() {
@@ -91,5 +93,9 @@ public abstract class PlayableCharacter extends Entity {
     }
 
     public abstract List<Move.ValidMoves> getMoves();
+
+    public void addToInventory(Item e) {
+        inventory.addItem(e);
+    }
 
 }

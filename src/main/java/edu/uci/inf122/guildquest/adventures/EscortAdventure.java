@@ -20,6 +20,7 @@ import edu.uci.inf122.guildquest.entities.playablecharacters.Assassin;
 import edu.uci.inf122.guildquest.entities.playablecharacters.Cleric;
 import edu.uci.inf122.guildquest.entities.playablecharacters.Move;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
+import edu.uci.inf122.guildquest.entities.nonlivings.Chest;
 import edu.uci.inf122.guildquest.ui.Page;
 import edu.uci.inf122.guildquest.ui.TerminalGrid;
 import edu.uci.inf122.guildquest.ui.playablecharacteruis.AssassinUI;
@@ -145,31 +146,35 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // String npcHint = nearbyNPC.speak();
         // String prompt = gridState.getGridStr()+npcHint+CHOICES_PROMPT
         boolean done = false;
-        currentPlayer=player1;
-        while (!done){
+        currentPlayer = player1;
+        while (!done) {
             List<Move.ValidMoves> moves = currentPlayer.getMoves();
             String moveString = TerminalGrid.toOptions(moves);
             String moveRegex = TerminalGrid.toOptionsRegex(moves);
-            String input = page.acceptStrUntil(currentPlayer.getName()+ "'s turn!\n"+moveString, moveRegex);
+            String input = page.acceptStrUntil(currentPlayer.getName() + "'s turn!\n" + moveString, moveRegex);
 
-            if (input.contains("move")){
-                if (! attemptMovePlayer(currentPlayer, input.charAt(input.length()-1)) ) continue;
-            }
-            else if (input.contains("attack")){
-                if (! attemptPlayerAttack(currentPlayer, input.charAt(input.length()-1)) ) continue;
-            }
-            else if (input.contains("heal self")){
-                if (! attemptPlayerHealSelf(currentPlayer)) continue;
-            }
-            else if (input.contains("heal")){
-                if (! attemptPlayerHealOther(currentPlayer,input.charAt(input.length()-1)) ) continue;
-            }
-            else if (input.equals("r")){
-                if ( ! makeHintRequest() ) continue; // check to see if npc is nearby
-            } else throw new IllegalStateException("Something went wrong with input, cannot parse");
+            if (input.contains("move")) {
+                if (!attemptMovePlayer(currentPlayer, input.charAt(input.length() - 1)))
+                    continue;
+            } else if (input.contains("attack")) {
+                if (!attemptPlayerAttack(currentPlayer, input.charAt(input.length() - 1)))
+                    continue;
+            } else if (input.contains("heal self")) {
+                if (!attemptPlayerHealSelf(currentPlayer))
+                    continue;
+            } else if (input.contains("heal")) {
+                if (!attemptPlayerHealOther(currentPlayer, input.charAt(input.length() - 1)))
+                    continue;
+            } else if (input.equals("r")) {
+                if (!makeHintRequest())
+                    continue; // check to see if npc is nearby
+            } else
+                throw new IllegalStateException("Something went wrong with input, cannot parse");
             gridState.render();
-            if (currentPlayer==player1) currentPlayer=player2;
-            else done=true;
+            if (currentPlayer == player1)
+                currentPlayer = player2;
+            else
+                done = true;
         }
         // if (player location is within 2 spaces of the destination) {
         // // give clear hints about the destination (ex: steps)
@@ -189,39 +194,6 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // if the player with the NPC is on the same grid cell as the destination, then
         // end the game with a win.
 
-        // for (Entity content : gridState.getCellContent(moveRow,
-        // moveCol).getContent()) {
-        // if (content.contains("Enemy") && playerWithNPC ==
-        // playerCharacters.indexOf(character)) {
-        // // end the game with a loss
-        // System.out.println("Game Over! You were caught by an enemy.");
-        // System.exit(0);
-        // }
-        // }
-        // }
-
-        // attack logic: psuedocode for now
-        // if (attack) {
-        // TODO: Identify which enemy the player wants to attack
-        // ask the player for the direction (since they don't know the enemy's location,
-        // they only know there is an enemy near them (within 2 spaces))
-        // if the user choice (direction) is correct, then the attack is successful and
-        // the enemies take
-
-        // player can choose: up, down, left, right
-        // the attack is applied to all the enemies in that direction within 2 spaces
-
-        // collect the enemies in the chosen direction within 2 spaces (don't include
-        // the non-enemy entities)
-        // for (enemy in enemies in that direction within 2 spaces) {
-        // player.attack(enemy);
-        // if (enemy is defeated) {
-        // // remove the enemy from the grid
-        // // let the player know that they defeated an enemy.
-        // }
-        // }
-        // }
-
         // Enemies:
         // - attack player if adjacent to player with NPC
         // - if the player attacked them, the enemy can attack the player back during
@@ -229,91 +201,87 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     }
 
     private boolean attemptPlayerHealSelf(PlayableCharacter p) {
-        if (p instanceof CanHealSelf healer){
-            if (p.isDead()){
+        if (p instanceof CanHealSelf healer) {
+            if (p.isDead()) {
                 page.print("You cannot heal yourself. You're dead!\n");
                 return false;
             }
-            if (p.getHealth().isFull()){
+            if (p.getHealth().isFull()) {
                 page.print("You're already at full health! Nothing to heal :)\n");
                 return false;
             }
-            if (p instanceof Cleric c){
+            if (p instanceof Cleric c) {
                 c.heal(c.getHealingPower());
                 page.print(c.getName() + " healed to " + c.getHealth() + '\n');
                 return true;
             }
             throw new IllegalStateException("Error in PlayerHeal, something went wrong");
-        } else{
+        } else {
             page.print("This character cannot heal\n");
             return false;
         }
     }
 
     private boolean attemptPlayerHealOther(PlayableCharacter p, char direction) {
-        if (p instanceof CanHealOther healer){
-            if (p.isDead()){
+        if (p instanceof CanHealOther healer) {
+            if (p.isDead()) {
                 page.print("You cannot heal others. You're dead!\n");
                 return false;
             }
-            if (gridState.isValidAdjacent(p, direction)){
+            if (gridState.isValidAdjacent(p, direction)) {
                 GridCell targetCell = gridState.getCellAdjacent(p, direction);
-                if (! targetCell.isEmpty()){
+                if (!targetCell.isEmpty()) {
                     Entity target = targetCell.getContent().get(0);
-                    if (target instanceof PlayableCharacter otherPlayer){
-                        if (otherPlayer.getHealth().isFull()){
+                    if (target instanceof PlayableCharacter otherPlayer) {
+                        if (otherPlayer.getHealth().isFull()) {
                             page.print("Already at full health. Do something else.\n");
                             return false;
-                        }
-                        else{
+                        } else {
                             healer.heal(healer.getHealAmount(), otherPlayer);
                             return true;
                         }
-                    }
-                    else{
+                    } else {
                         page.print("can only heal other players for now.\n");
                         return false;
                     }
-                }
-                else{
+                } else {
                     page.print("Target cell is empty, cannot heal here\n");
                     return false;
                 }
-            }
-            else{
+            } else {
                 page.print("You cannot heal in that direction\n");
                 return false;
             }
-        } else{
+        } else {
             page.print("This character cannot others!\n");
             return false;
         }
     }
 
-    public void acceptInput(){
+    public void acceptInput() {
 
     }
 
     private boolean attemptPlayerAttack(PlayableCharacter p, char direction) {
         GridCell attackTarget = gridState.getCellAdjacent(currentPlayer, direction);
         if (attackTarget.isEmpty() ||
-                ! (attackTarget.getContent().get(0) instanceof Hostile)){
+                !(attackTarget.getContent().get(0) instanceof Hostile)) {
             page.print("Cannot attack that cell\n\n");
             return false;
         }
         int[] target = gridState.getLocationCords(gridState.getLocation(p));
-        switch (direction){
-            case 'e' -> target[1]+=1;
-            case 'w' -> target[1]-=1;
-            case 's' -> target[0]+=1;
-            case 'n' -> target[0]-=1;
+        switch (direction) {
+            case 'e' -> target[1] += 1;
+            case 'w' -> target[1] -= 1;
+            case 's' -> target[0] += 1;
+            case 'n' -> target[0] -= 1;
             default -> throw new IllegalStateException("Unexpected direction: " + direction);
         }
         GridCell targetCell = gridState.getCell(target[0], target[1]);
 
         p.attack(targetCell.getContent().get(0)); // assume only on 1st layer
-        if (targetCell.getContent().get(0) instanceof Goblin g){
-            if (g.isDead()){
+        if (targetCell.getContent().get(0) instanceof Goblin g) {
+            if (g.isDead()) {
                 gridState.removeEntity(g);
                 enemies.remove(g);
                 gridState.render();
@@ -322,8 +290,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         return true;
     }
 
-    public void allEnemyTurns(){
-        for (Entity h : enemies){
+    public void allEnemyTurns() {
+        for (Entity h : enemies) {
             enemyTurn(h);
         }
     }
@@ -344,15 +312,17 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // if so, attack the players
         // else, skip the enemy's turn for now
 
-        if (enemy instanceof Hostile h){
+        if (enemy instanceof Hostile h) {
             List<Entity> nearbyEntities = gridState.nearbyEntities(gridState.getLocation(enemy), 2);
             Entity target = h.prioritizeAttack(nearbyEntities);
 
-            if (target==null) return;
+            if (target == null)
+                return;
             h.attack(target);
         }
 
-//            // TODO: add more concrete logic for enemy attacks (ex: prioritize an enemy who can attack many players)+
+        // // TODO: add more concrete logic for enemy attacks (ex: prioritize an enemy
+        // who can attack many players)+
 
     }
 
@@ -384,12 +354,16 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         Item item1 = ItemFactory.createWeapon("blue sword", 1, "a blue sword", 6);
         Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
         Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
-        items =  new ArrayList<>(List.of(item1, item2, item2));
+
+        Chest chest1 = new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword"));
+        Chest chest2 = new Chest(new Name("chest2"), item2, new Text("a chest with a red stick"));
+        Chest chest3 = new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe"));
+        items = new ArrayList<>(List.of(item1, item2, item3));
 
         NPC npc1 = new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10));
         NPC npc2 = new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100));
 
-        npcs =  new ArrayList<>(List.of(npc1, npc2));
+        npcs = new ArrayList<>(List.of(npc1, npc2));
 
         // randomly place the entities on the grid
         // princess, player1, and player2 are placed at the same starting point.
@@ -436,7 +410,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         }
         p1UI.display();
         p2UI.display();
-        currentPlayer=player1;
+        currentPlayer = player1;
 
     }
 
@@ -446,22 +420,32 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      * @param p         the p
      * @param direction the direction
      */
-    public boolean attemptMovePlayer(PlayableCharacter p, char direction){
+    public boolean attemptMovePlayer(PlayableCharacter p, char direction) {
         if (!gridState.canMove(currentPlayer, direction)) {
             page.print("Cannot move in that direction\n");
             return false;
         }
         int[] target = gridState.getLocationCords(gridState.getLocation(p));
         gridState.removeEntity(p);
-        switch (direction){
-            case 'e' -> target[1]+=1;
-            case 'w' -> target[1]-=1;
-            case 's' -> target[0]+=1;
-            case 'n' -> target[0]-=1;
+        switch (direction) {
+            case 'e' -> target[1] += 1;
+            case 'w' -> target[1] -= 1;
+            case 's' -> target[0] += 1;
+            case 'n' -> target[0] -= 1;
             default -> throw new IllegalStateException("Unexpected direction: " + direction);
         }
         GridCell targetCell = gridState.getCell(target[0], target[1]);
-        gridState.setCellWithChecking(targetCell, p);
+        if (targetCell.getContent().stream().anyMatch(e -> e instanceof Chest)) {
+            Chest chest = (Chest) targetCell.getContent().stream().filter(e -> e instanceof Chest).findFirst().get();
+            Item item = chest.take();
+            if (item != null) {
+                p.addToInventory(item);
+            }
+            gridState.removeEntity(chest);
+        }
+        if (!gridState.setCellWithChecking(targetCell, p)) {
+            return false;
+        }
         return true;
     }
 
@@ -554,8 +538,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         if (player1.isDead() || player2.isDead()) {
             page.print("You died! You lost.");
             return true;
-        }
-        else return false;
+        } else
+            return false;
     }
 
     public static void main(String[] args) {

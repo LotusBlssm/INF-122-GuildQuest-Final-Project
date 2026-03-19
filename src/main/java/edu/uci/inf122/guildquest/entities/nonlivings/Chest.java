@@ -31,14 +31,12 @@ public class Chest extends Nonliving {
      * Attempt to open the chest. Does not grab the item.
      *
      */
-    public void open(){
-        if (status.isLooted()){
+    public void open() {
+        if (status.isLooted()) {
             System.out.println("The chest is already open and looted.");
-        }
-        else if (status.isOpen()){
+        } else if (status.isOpen()) {
             System.out.println("You open the chest and see: " + contents);
-        }
-        else if (status.isClosed()) {
+        } else if (status.isClosed()) {
             status = new ChestStatus(ChestStatus.Status.OPEN);
             System.out.println("You open the chest and see: " + contents);
         }
@@ -49,17 +47,17 @@ public class Chest extends Nonliving {
      *
      * @param c the character
      */
-    public void take(Character c){
-        if (status.isClosed()){
+    public Item take() {
+        if (status.isClosed()) {
             System.out.println("Closed, please open first");
-        }
-        else if (status.isOpen()){
+        } else if (status.isOpen()) {
             System.out.println("You take: " + contents.getName());
-            giveItem(c);
-        }
-        else if (status.isLooted()){
+            status = new ChestStatus(ChestStatus.Status.LOOTED);
+            return contents;
+        } else if (status.isLooted()) {
             System.out.println("There is nothing to take in this chest.");
         }
+        return null;
     }
 
     /**
