@@ -3,8 +3,9 @@ package edu.uci.inf122.guildquest.entities.nonlivings;
 import edu.uci.inf122.guildquest.content.Item;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
+import edu.uci.inf122.guildquest.entities.interfaces.Absorbable;
 
-public class Chest extends Nonliving {
+public class Chest extends Nonliving implements Absorbable {
     protected ChestStatus status;
     private Item contents;
 
@@ -35,10 +36,10 @@ public class Chest extends Nonliving {
         if (status.isLooted()) {
             System.out.println("The chest is already open and looted.");
         } else if (status.isOpen()) {
-            System.out.println("You open the chest and see: " + contents);
+            System.out.println("You open the chest and see: " + contents.getName());
         } else if (status.isClosed()) {
             status = new ChestStatus(ChestStatus.Status.OPEN);
-            System.out.println("You open the chest and see: " + contents);
+            System.out.println("You open the chest and see: " + contents.getName());
         }
     }
 
@@ -49,8 +50,10 @@ public class Chest extends Nonliving {
      */
     public Item take() {
         if (status.isClosed()) {
-            System.out.println("Closed, please open first");
-        } else if (status.isOpen()) {
+//            System.out.println("Closed, please open first");
+            open();
+        }
+        if (status.isOpen()) {
             System.out.println("You take: " + contents.getName());
             status = new ChestStatus(ChestStatus.Status.LOOTED);
             return contents;

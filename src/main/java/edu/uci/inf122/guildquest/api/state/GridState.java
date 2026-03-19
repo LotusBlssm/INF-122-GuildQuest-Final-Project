@@ -100,7 +100,7 @@ public abstract class GridState implements State {
             case 'n' -> target[0] -= 1;
             default -> throw new IllegalStateException("Unexpected direction: " + direction);
         }
-        return isValidPosition(target[0], target[1]) && getCell(target[0], target[1]).isEmpty();
+        return isValidPosition(target[0], target[1]) && (getCell(target[0], target[1]).isEmpty() || getCell(target[0], target[1]).holdsAbsorbableEntity());
     }
 
     public int getDistance(int row1, int col1, int row2, int col2) {

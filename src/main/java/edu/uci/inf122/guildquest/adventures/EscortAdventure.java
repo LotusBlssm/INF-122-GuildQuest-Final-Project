@@ -80,6 +80,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     private PlayableCharacter player1;
     private PlayableCharacter player2;
     private List<Entity> enemies;
+    private List<Entity> chests;
     private List<Entity> items;
     private List<Entity> npcs;
     private final static Page page = Page.getPage();
@@ -354,11 +355,12 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         Item item1 = ItemFactory.createWeapon("blue sword", 1, "a blue sword", 6);
         Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
         Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
+        items = new ArrayList<>(List.of(item1, item2, item3));
 
         Chest chest1 = new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword"));
         Chest chest2 = new Chest(new Name("chest2"), item2, new Text("a chest with a red stick"));
         Chest chest3 = new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe"));
-        items = new ArrayList<>(List.of(item1, item2, item3));
+        chests = new ArrayList<>(List.of(chest1, chest2, chest3));
 
         NPC npc1 = new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10));
         NPC npc2 = new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100));
@@ -372,7 +374,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         gridState.setCell(0, 2, player2);
 
         gridState.initializeGrid(enemies);
-        gridState.initializeGrid(items);
+//        gridState.initializeGrid(items);
+        gridState.initializeGrid(chests);
         gridState.initializeGrid(npcs);
     }
 
@@ -435,7 +438,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             default -> throw new IllegalStateException("Unexpected direction: " + direction);
         }
         GridCell targetCell = gridState.getCell(target[0], target[1]);
-        if (targetCell.getContent().stream().anyMatch(e -> e instanceof Chest)) {
+        if (targetCell.hasContent() && targetCell.getContent().stream().anyMatch(e -> e instanceof Chest)) {
             Chest chest = (Chest) targetCell.getContent().stream().filter(e -> e instanceof Chest).findFirst().get();
             Item item = chest.take();
             if (item != null) {
