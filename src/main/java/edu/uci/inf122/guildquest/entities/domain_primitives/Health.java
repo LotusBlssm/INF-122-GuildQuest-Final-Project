@@ -75,4 +75,13 @@ public class Health {
     public static Health createDefault(){
         return new Health(HEALTH_DEFAULT, HEALTH_DEFAULT);
     }
+
+    @Override
+    public String toString() {
+        return Integer.toString(health);
+    }
+
+    public boolean isFull() {
+        return health==capacity;
+    }
 }

@@ -2,13 +2,19 @@ package edu.uci.inf122.guildquest.entities.playablecharacters;
 
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
-import edu.uci.inf122.guildquest.entities.interfaces.CanAttack;
+import edu.uci.inf122.guildquest.entities.interfaces.AttackMove;
+import edu.uci.inf122.guildquest.entities.interfaces.CardinalTravelMove;
+import edu.uci.inf122.guildquest.ui.TerminalGrid;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.AssassinUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
 
-public class Assassin extends PlayableCharacter implements CanAttack {
+import java.util.List;
+
+public class Assassin extends PlayableCharacter implements AttackMove, CardinalTravelMove {
     private static Assassin instance;
-
     private final DecimalAmount criticalHitChance;
     private final Amount attackPower;
+    private static final List<ValidMoves> moves = List.of(ValidMoves.TRAVEL, ValidMoves.ATTACK, ValidMoves.REQUEST_HINT);
 
     private Assassin(Name name) {
         super(name, new Health(80), new Level(1), new CharacterClass(new Name("Assassin")));
@@ -16,7 +22,7 @@ public class Assassin extends PlayableCharacter implements CanAttack {
         this.attackPower = new Amount(20);
     }
 
-    public static Assassin getInstance(Name name){
+    public static Assassin getInstance(Name name) {
         if (instance == null) {
             instance = new Assassin(name);
         }
@@ -54,5 +60,29 @@ public class Assassin extends PlayableCharacter implements CanAttack {
             System.out.println(getName() + " lands a critical hit!");
         }
         dealDamage(target, modified);
+    }
+
+    public DecimalAmount getCriticalHitChance() {
+        return criticalHitChance;
+    }
+
+    public DecimalAmount getCriticalHitChanceDisplay() {
+        DecimalAmount display = criticalHitChance.multiply(100);
+        return display;
+    }
+
+    public Amount getAttackPower() {
+        return attackPower;
+    }
+    @Override
+    public void execute(TerminalGrid state, ValidMoves move) {
+    }
+    public List<Move.ValidMoves> getMoves(){
+        return moves;
+    }
+
+    @Override
+    public AssassinUI getUI() {
+        return AssassinUI.getAssassinUI(this);
     }
 }

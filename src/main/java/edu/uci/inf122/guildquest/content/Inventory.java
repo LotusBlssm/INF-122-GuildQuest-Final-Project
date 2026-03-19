@@ -2,6 +2,7 @@ package edu.uci.inf122.guildquest.content;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class Inventory {
     private List<Item> contents;
@@ -24,5 +25,12 @@ public class Inventory {
 
     public boolean removeItem(Item item) {
         return contents.remove(item);
+    }
+
+    public boolean isEmpty(){
+        return contents==null || contents.isEmpty();
+    }
+
+    public void forEach(Consumer<? super Item> action) {
     }
 }

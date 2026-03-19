@@ -28,4 +28,9 @@ public class Damage {
                 damage.getCount() + i.getCount()
         )));
     }
+
+    @Override
+    public String toString() {
+        return damage.toString();
+    }
 }

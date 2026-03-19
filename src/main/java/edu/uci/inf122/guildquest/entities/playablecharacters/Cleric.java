@@ -1,11 +1,21 @@
 package edu.uci.inf122.guildquest.entities.playablecharacters;
 
+import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
+import edu.uci.inf122.guildquest.entities.interfaces.CanHealOther;
+import edu.uci.inf122.guildquest.entities.interfaces.CanHealSelf;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.ClericUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.KnightUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
 
-public class Cleric extends PlayableCharacter {
+import java.util.List;
+
+public class Cleric extends PlayableCharacter implements CanHealSelf, CanHealOther {
     private static Cleric instance;
-    
     private final DecimalAmount healingPower;
+
+    private static final List<Move.ValidMoves> moves = List.of(Move.ValidMoves.TRAVEL, Move.ValidMoves.HEAL_OTHER,
+        Move.ValidMoves.HEAL_SELF, Move.ValidMoves.REQUEST_HINT);
 
     protected Cleric(Name name) {
         super(name, new Health(90), new Level(1), new CharacterClass("Cleric"));
@@ -44,6 +54,32 @@ public class Cleric extends PlayableCharacter {
 
     public void heal(Amount amount, PlayableCharacter target) {
         target.heal(amount);
-        System.out.println(getName() + " heals " + target.getName() + " for " + amount.getCount() + " health.");
+        System.out.println(getName() + " heals "  + amount.getCount() + " health for "+ target.getName());
+    }
+
+    @Override
+    public Amount getHealAmount() {
+        return getHealingPower().toAmount();
+    }
+
+    public void attack(Entity target){
+        System.out.println("Clerics are pacifists, and cannot attack");
+    }
+
+    public DecimalAmount getHealingPower() {
+        return healingPower;
+    }
+    @Override
+    public List<Move.ValidMoves> getMoves(){
+        return moves;
+    }
+
+    @Override
+    public void heal(int amount) {
+
+    }
+    @Override
+    public ClericUI getUI() {
+        return ClericUI.getClericUI(this);
     }
 }

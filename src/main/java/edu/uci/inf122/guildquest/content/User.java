@@ -31,6 +31,10 @@ public class User extends GameContent {
         userName = name;
     }
 
+    public String getName() {
+        return userName;
+    }
+
     public void setRealm(UUID id) {
         currentRealmID = id;
     }

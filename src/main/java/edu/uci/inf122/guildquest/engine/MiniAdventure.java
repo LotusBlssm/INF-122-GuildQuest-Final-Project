@@ -10,36 +10,31 @@ import edu.uci.inf122.guildquest.entities.Entity;
 import java.util.List;
 
 public abstract class MiniAdventure {
-    protected List<Realm> realms;
-    protected List<Entity> entities;
-    protected List<WinCondition> winConditions;
-    protected List<User> players;
-    protected State state;
-    protected AdventureSnapshot previousSave;
-
-    protected MiniAdventure(List<Realm> realms, List<Entity> entities,
-                            List<WinCondition> winConditions, List<User> players,
-                            State state) {
-        this.realms = realms;
-        this.entities = entities;
-        this.winConditions = winConditions;
-        this.players = players;
-        this.state = state;
-        this.previousSave = null;
-    }
-
-    public abstract String getName();
-    public abstract String getDescription();
+    private List<Realm> realms;
+    private List<Entity> entities; // placeholder for now - will be replaced with actual Entity objects
+    private List<WinCondition> winCondition;
+    private List<User> players;
+    private State state;
+    private AdventureSnapshot previousSave = null;
 
     public abstract void play();
+
     public abstract void acceptInput();
+
     public abstract void advanceCycle();
+
     public abstract AdventureSnapshot saveSnapshot();
 
-    public List<Realm> getRealms() { return realms; }
-    public List<Entity> getEntities() { return entities; }
-    public List<WinCondition> getWinConditions() { return winConditions; }
-    public List<User> getPlayers() { return players; }
-    public State getState() { return state; }
-    public AdventureSnapshot getPreviousSave() { return previousSave; }
+    public MiniAdventure(List<Realm> realms, List<Entity> entities, List<WinCondition> winCondition,
+            List<User> players) {
+        this.realms = realms;
+        this.entities = entities;
+        this.winCondition = winCondition;
+        this.players = players;
+
+    }
+
+    public User getPlayer(int index) {
+        return players.get(index);
+    }
 }

@@ -4,19 +4,27 @@ import edu.uci.inf122.guildquest.content.Inventory;
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.npcs.NPC;
+import edu.uci.inf122.guildquest.content.Item;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
+
+import java.util.List;
 
 public abstract class PlayableCharacter extends Entity {
     private Health health;
     private final Level level;
     private final CharacterClass characterClass;
     private final Inventory inventory;
+    private static final List<Move.ValidMoves> moves = List.of();
+
+    private final WithPrincess withPrincess;
 
     public PlayableCharacter(Name name, Health health, Level level, CharacterClass characterClass) {
-        this.name = name;
+        super(name);
         this.health = health;
         this.level = level;
         this.characterClass = characterClass;
         this.inventory = new Inventory();
+        this.withPrincess = new WithPrincess(false);
     }
 
     @Override
@@ -28,16 +36,16 @@ public abstract class PlayableCharacter extends Entity {
 
     public abstract void takeDamage(Damage damage);
 
-
     /**
      * Heals this player.
      *
      * @param amount the amount to heal by.
      */
-    protected void heal(Amount amount) {
+    public void heal(Amount amount) {
         health.increaseBy(amount);
     }
-    protected void heal(DecimalAmount amount) {
+
+    public void heal(DecimalAmount amount) {
         health.increaseBy(amount);
     }
 
@@ -51,8 +59,7 @@ public abstract class PlayableCharacter extends Entity {
             if (target instanceof NPC npcTarget) {
                 npcTarget.takeDamage(damage);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("An error occurred while trying to deal damage: " + e.getMessage());
         }
     }
@@ -72,4 +79,26 @@ public abstract class PlayableCharacter extends Entity {
     public Inventory getInventory() {
         return inventory;
     }
+
+    public void attack(Entity target) {
+        throw new UnsupportedOperationException(
+                getClass().getSimpleName() + " does not implement attack(Entity) yet.");
+    }
+
+    public boolean isDead() {
+        return health.getHealth() <= 0;
+    }
+
+    public WithPrincess getWithPrincess() {
+        return withPrincess;
+    }
+
+    public abstract List<Move.ValidMoves> getMoves();
+
+    public void addToInventory(Item e) {
+        inventory.addItem(e);
+    }
+
+    public abstract PlayableCharacterUI getUI();
+
 }

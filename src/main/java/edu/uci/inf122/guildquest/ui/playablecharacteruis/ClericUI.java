@@ -1,0 +1,47 @@
+package edu.uci.inf122.guildquest.ui.playablecharacteruis;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.uci.inf122.guildquest.entities.playablecharacters.Cleric;
+
+public class ClericUI extends PlayableCharacterUI {
+    private static ClericUI singleton;
+    private final Cleric character;
+
+    private ClericUI(Cleric character) {
+        super(character);
+        this.character = character;
+    }
+
+    public static ClericUI getClericUI(Cleric cleric) {
+        if (singleton==null)
+            singleton = new ClericUI(cleric);
+        return singleton;
+    }
+
+    @Override
+    public void display() {
+        List<String> lines = new ArrayList<>();
+        lines.add("Name: " + character.getName());
+        lines.add("Health: " + character.getHealth());
+        lines.add("Healing Power: " + character.getHealingPower().getCount());
+
+        if (character.getWithPrincess().isWithPrincess()) {
+            lines.add("Escorting Princess: true");
+        }
+
+        int maxLength = 0;
+        for (String line : lines) {
+            maxLength = Math.max(maxLength, line.length());
+        }
+
+        String border = "+" + "-".repeat(maxLength + 2) + "+";
+
+        System.out.println(border);
+        for (String line : lines) {
+            System.out.println("| " + String.format("%-" + maxLength + "s", line) + " |");
+        }
+        System.out.println(border);
+    }
+}

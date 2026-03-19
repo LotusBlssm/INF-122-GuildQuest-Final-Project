@@ -1,14 +1,16 @@
 package edu.uci.inf122.guildquest.entities.nonlivings;
 
 import edu.uci.inf122.guildquest.content.Item;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
+import edu.uci.inf122.guildquest.entities.interfaces.Absorbable;
 
-public class Chest extends Nonliving {
+public class Chest extends Nonliving implements Absorbable {
     protected ChestStatus status;
     private Item contents;
 
-    public Chest(Item contents, Text description) {
-        super(description);
+    public Chest(Name name, Item contents, Text description) {
+        super(name, description);
         this.contents = contents;
         this.status = new ChestStatus(ChestStatus.Status.CLOSED);
     }
@@ -30,35 +32,34 @@ public class Chest extends Nonliving {
      * Attempt to open the chest. Does not grab the item.
      *
      */
-    public void open(){
-        if (status.isLooted()){
+    public void open() {
+        if (status.isLooted()) {
             System.out.println("The chest is already open and looted.");
-        }
-        else if (status.isOpen()){
-            System.out.println("You open the chest and see: " + contents);
-        }
-        else if (status.isClosed()) {
+        } else if (status.isOpen()) {
+            System.out.println("You open the chest and see: " + contents.getName());
+        } else if (status.isClosed()) {
             status = new ChestStatus(ChestStatus.Status.OPEN);
-            System.out.println("You open the chest and see: " + contents);
+            System.out.println("You open the chest and see: " + contents.getName());
         }
     }
 
     /**
      * attempt to take from the chest
      *
-     * @param c the character
      */
-    public void take(Character c){
-        if (status.isClosed()){
-            System.out.println("Closed, please open first");
+    public Item take() {
+        if (status.isClosed()) {
+//            System.out.println("Closed, please open first");
+            open();
         }
-        else if (status.isOpen()){
+        if (status.isOpen()) {
             System.out.println("You take: " + contents.getName());
-            giveItem(c);
-        }
-        else if (status.isLooted()){
+            status = new ChestStatus(ChestStatus.Status.LOOTED);
+            return contents;
+        } else if (status.isLooted()) {
             System.out.println("There is nothing to take in this chest.");
         }
+        return null;
     }
 
     /**

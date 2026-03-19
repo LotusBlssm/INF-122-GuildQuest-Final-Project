@@ -1,6 +1,8 @@
 package edu.uci.inf122.guildquest.api.state;
 
 import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.interfaces.Absorbable;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -20,7 +22,9 @@ public class GridCell {
     }
 
     public boolean hasContent() {
-        return content != null;
+        if (content==null) return false;
+        else if (content.isEmpty()) return false;
+        else return true;
     }
 
     public List<Entity> getContent() {
@@ -35,5 +39,10 @@ public class GridCell {
     // Helper method for readability when checking the grid
     public boolean isEmpty() {
         return content == null || content.isEmpty();
+    }
+
+    public boolean holdsAbsorbableEntity() {
+        if (isEmpty()) return false;
+        return content.get(0) instanceof Absorbable;
     }
 }

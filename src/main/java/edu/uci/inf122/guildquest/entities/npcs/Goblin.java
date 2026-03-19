@@ -4,10 +4,13 @@ import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 
+import java.util.List;
+
 import static edu.uci.inf122.guildquest.ui.UserUI.page;
 
 public class Goblin extends NPC implements Hostile {
     private Level level;
+
     public Goblin(Name name, Health health, Level level) {
         super(name, health);
         this.level = level;
@@ -23,16 +26,22 @@ public class Goblin extends NPC implements Hostile {
         // TODO: Implement goblin movement logic.
     }
 
+    public Health getHealth() {
+        return health;
+    }
+
     @Override
     public void attack(Entity target) {
         Damage damage = new Damage(Math.max(1, attackPower));
 
         if (target instanceof PlayableCharacter playableTarget) {
+            System.out.println(name+" attacks!");
             playableTarget.takeDamage(damage);
             return;
         }
 
         if (target instanceof NPC npcTarget) {
+            System.out.println(name+" attacks!");
             npcTarget.takeDamage(damage);
             return;
         }
@@ -46,12 +55,6 @@ public class Goblin extends NPC implements Hostile {
     }
 
     @Override
-    public void takeDamage(Damage damage) {
-        getHealth().reduceBy(damage);
-        System.out.println(getName() + " takes " + damage + " damage. Health: " + getHealth());
-    }
-
-    @Override
     public void heal(Amount amount) {
         getHealth().increaseBy(amount);
     }
@@ -60,4 +63,5 @@ public class Goblin extends NPC implements Hostile {
     public void warCry() {
         page.print("GARBLE GARBLE");
     }
+
 }

@@ -28,4 +28,9 @@ public class Amount {
     public DecimalAmount multiply(double i) {
         return new DecimalAmount(count*i);
     }
+
+    @Override
+    public String toString() {
+        return Integer.toString(count);
+    }
 }

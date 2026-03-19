@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.IntBinaryOperator;
 import java.util.function.UnaryOperator;
-
+import java.util.regex.Pattern;
 
 
 public class Page {
@@ -99,6 +99,18 @@ public class Page {
         }
         throw new Error("User refused to choose valid choice");
     }
+
+    public String acceptStrUntil(String prompt, String regex ){
+        System.out.print(prompt);
+        String res = scanner.nextLine();
+        while (!Pattern.matches(regex, res)){
+            System.out.print("Sorry, please enter a valid input\n\n");
+            System.out.print(prompt);
+            res = scanner.nextLine();
+        }
+        return res;
+    }
+
     public static String dynamicPrompt(String prompt, String strVar){
         return prompt.formatted(strVar);
     }
