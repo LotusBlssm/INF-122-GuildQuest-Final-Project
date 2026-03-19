@@ -29,8 +29,4 @@ public class Damage {
         )));
     }
 
-    @Override
-    public String toString() {
-        return damage.toString();
-    }
 }
