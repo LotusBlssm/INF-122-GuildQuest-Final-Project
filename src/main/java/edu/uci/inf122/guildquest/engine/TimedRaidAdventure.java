@@ -9,7 +9,6 @@ import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 import edu.uci.inf122.guildquest.content.Realm;
 import edu.uci.inf122.guildquest.content.User;
 import edu.uci.inf122.guildquest.entities.Entity;
-import edu.uci.inf122.guildquest.entities.interfaces.CanAttack;
 import edu.uci.inf122.guildquest.entities.npcs.Hostile;
 import edu.uci.inf122.guildquest.entities.npcs.NPC;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
@@ -28,12 +27,18 @@ public class TimedRaidAdventure extends MiniAdventure {
     private List<PlayableCharacter> playerCharacters;
     private int[][] playerPositions; // [playerIndex][0=row, 1=col]
     private String pendingCommand;
+    private List<User> players;
+    private List<Entity> entities;
+    private List<WinCondition> winConditions;
 
     public TimedRaidAdventure(List<Realm> realms, List<Entity> entities,
             List<WinCondition> winConditions, List<User> players,
             State state, int secondsPerPlayer,
             List<PlayableCharacter> playerCharacters) {
-        super(realms, entities, winConditions, players, state);
+        super(realms, entities, winConditions, players);
+        this.players = players;
+        this.entities = entities;
+        this.winConditions = winConditions;
         this.turnTimer = new TurnTimer(players.size(), secondsPerPlayer);
         this.currentPlayerIndex = 0;
         this.turnNumber = 0;
@@ -45,12 +50,10 @@ public class TimedRaidAdventure extends MiniAdventure {
         this.pendingCommand = null;
     }
 
-    @Override
     public String getName() {
         return "Timed Raid";
     }
 
-    @Override
     public String getDescription() {
         return "A timed raid where two players compete under a turn timer.";
     }
@@ -88,6 +91,12 @@ public class TimedRaidAdventure extends MiniAdventure {
                 turnTimer.endTurn();
                 if (!checkGameOver()) {
                     turnNumber++;
+                    // After all players have gone, hostiles take a turn
+                    if (currentPlayerIndex == players.size() - 1) {
+                        hostileTurn();
+                        removeDeadEntities();
+                        if (checkGameOver()) continue;
+                    }
                     swapTurn();
                 }
             }
@@ -229,11 +238,7 @@ public class TimedRaidAdventure extends MiniAdventure {
         PlayableCharacter pc = playerCharacters.get(currentPlayerIndex);
         Entity target = targetCell.getContent().get(0);
 
-        if (pc instanceof CanAttack attacker) {
-            attacker.attack(target);
-        } else {
-            System.out.println(pc.getName() + " cannot attack.");
-        }
+        pc.attack(target);
     }
 
     private void handleOpen(String direction) {
@@ -317,12 +322,24 @@ public class TimedRaidAdventure extends MiniAdventure {
 
     private void printStatus() {
         System.out.println("--- Turn " + turnNumber + " ---");
+        System.out.println("Players:");
         for (int i = 0; i < players.size(); i++) {
             PlayableCharacter pc = playerCharacters.get(i);
             String marker = (i == currentPlayerIndex) ? " <<" : "";
             System.out.println("  " + players.get(i).getUsername()
-                    + " (" + pc.getName() + ") HP:" + pc.getHealth().getHealth()
+                    + " (" + pc.getName() + ") HP:" + pc.getHealth()
                     + " | Time: " + turnTimer.getSecondsRemaining(i) + "s" + marker);
+        }
+        // Show living enemies
+        boolean hasEnemies = false;
+        for (Entity e : entities) {
+            if (e instanceof NPC npc && e instanceof Hostile && !npc.isDead()) {
+                if (!hasEnemies) {
+                    System.out.println("Enemies:");
+                    hasEnemies = true;
+                }
+                System.out.println("  " + npc.getName() + " HP:" + npc.getHealth());
+            }
         }
     }
 
@@ -352,6 +369,66 @@ public class TimedRaidAdventure extends MiniAdventure {
 
     private void swapTurn() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+    }
+
+    private void hostileTurn() {
+        System.out.println();
+        System.out.println("--- Enemy turn ---");
+        for (int r = 0; r < grid.getLength(); r++) {
+            for (int c = 0; c < grid.getWidth(); c++) {
+                GridCell cell = grid.getCell(r, c);
+                if (cell.isEmpty()) continue;
+                Entity e = cell.getContent().get(0);
+                if (!(e instanceof Hostile hostile) || !(e instanceof NPC npc)) continue;
+                if (npc.isDead()) continue;
+
+                // Check if any player is adjacent — if so, attack
+                boolean attacked = false;
+                int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+                for (int[] d : dirs) {
+                    int adjR = r + d[0];
+                    int adjC = c + d[1];
+                    if (!grid.isValidPosition(adjR, adjC)) continue;
+                    GridCell adjCell = grid.getCell(adjR, adjC);
+                    if (!adjCell.isEmpty() && adjCell.getContent().get(0) instanceof PlayableCharacter) {
+                        hostile.attack(adjCell.getContent().get(0));
+                        attacked = true;
+                        break;
+                    }
+                }
+
+                // If no adjacent player, move toward nearest player
+                if (!attacked) {
+                    int bestDist = Integer.MAX_VALUE;
+                    int bestPIdx = 0;
+                    for (int p = 0; p < playerPositions.length; p++) {
+                        int dist = grid.getDistance(r, c, playerPositions[p][0], playerPositions[p][1]);
+                        if (dist < bestDist) {
+                            bestDist = dist;
+                            bestPIdx = p;
+                        }
+                    }
+
+                    int targetR = playerPositions[bestPIdx][0];
+                    int targetC = playerPositions[bestPIdx][1];
+                    int moveR = r;
+                    int moveC = c;
+
+                    // Move one step toward nearest player
+                    if (Math.abs(targetR - r) >= Math.abs(targetC - c)) {
+                        moveR += (targetR > r) ? 1 : -1;
+                    } else {
+                        moveC += (targetC > c) ? 1 : -1;
+                    }
+
+                    if (grid.isValidPosition(moveR, moveC) && grid.getCell(moveR, moveC).isEmpty()) {
+                        cell.removeContent();
+                        grid.setCell(moveR, moveC, e);
+                        System.out.println(npc.getName() + " moves closer...");
+                    }
+                }
+            }
+        }
     }
 
     private void removeDeadEntities() {
