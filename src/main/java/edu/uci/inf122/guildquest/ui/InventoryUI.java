@@ -116,7 +116,7 @@ public class InventoryUI {
         }
         int input = page.acceptIntUntil(prompt.toString(), i - 1);
         page.nextScreen();
-        return inventory.getItems().get(input);
+        return inventory.getItems().get(input-1);
     }
 
     public static Item queryInventory(Inventory inventory) {

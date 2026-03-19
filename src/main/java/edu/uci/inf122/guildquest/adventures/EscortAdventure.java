@@ -154,7 +154,6 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             String moveString = TerminalGrid.toOptions(moves);
             String moveRegex = TerminalGrid.toOptionsRegex(moves);
             String input = page.acceptStrUntil(currentPlayer.getName() + "'s turn!\n" + moveString, moveRegex);
-
             if (input.contains("move")) {
                 if (!attemptMovePlayer(currentPlayer, input.charAt(input.length() - 1)))
                     continue;
@@ -216,7 +215,15 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         if (item==null)
             return false;
         if (item instanceof SelfApplicable i){
-            return i.use(currentPlayer);
+            int prev = currentPlayer.getHealth().getHealth();
+            boolean success = i.use(currentPlayer);
+            if (!success){
+                page.print("something went wrong, not healed");
+                return false;
+            }
+            int cur = currentPlayer.getHealth().getHealth();
+            page.print("heal increased from "+prev+" to "+cur+'\n');
+            return success;
         } else{
             page.print("have not implemented items that can be applied to others");
             return false;
@@ -378,7 +385,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
         Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
         Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
-        items = new ArrayList<>(List.of(item1, item2, item3));
+        items = new ArrayList<>(List.of(item2, item3));
 
         Chest chest1 = new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword"));
         Chest chest2 = new Chest(new Name("chest2"), item2, new Text("a chest with a red stick"));
@@ -395,6 +402,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         gridState.setCell(0, 0, princess_npc);
         gridState.setCell(0, 1, player1);
         gridState.setCell(0, 2, player2);
+        gridState.setCell(2, 1, item1);
 
         gridState.initializeGrid(enemies);
         gridState.initializeGrid(items);
@@ -475,10 +483,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 gridState.removeEntity(item);
             }
         }
-        if (!gridState.setCellWithChecking(targetCell, p)) {
-            return false;
-        }
-        return true;
+        return gridState.setCellWithChecking(targetCell, p);
     }
 
     public void makeAttack(int currentPlayer) {
