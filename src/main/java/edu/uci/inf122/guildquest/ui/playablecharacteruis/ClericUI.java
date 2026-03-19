@@ -15,8 +15,9 @@ public class ClericUI extends PlayableCharacterUI {
     }
 
     public static ClericUI getClericUI(Cleric cleric) {
-        if (singleton==null) return new ClericUI(cleric);
-        else return singleton;
+        if (singleton==null)
+            singleton = new ClericUI(cleric);
+        return singleton;
     }
 
     @Override

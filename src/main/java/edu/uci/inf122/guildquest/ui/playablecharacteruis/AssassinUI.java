@@ -15,8 +15,9 @@ public class AssassinUI extends PlayableCharacterUI {
     }
 
     public static AssassinUI getAssassinUI(Assassin character){
-        if (singleton==null) return new AssassinUI(character);
-        else return singleton;
+        if (singleton==null)
+            singleton = new AssassinUI(character);
+        return singleton;
 
     }
 

@@ -11,9 +11,9 @@ public class KnightUI extends PlayableCharacterUI {
 
     public static KnightUI getKnightUI(Knight character){
         if (singleton==null){
-            return new KnightUI(character);
-        } else return singleton;
-
+            singleton=new KnightUI(character);
+        }
+        return singleton;
     }
     private KnightUI(Knight character) {
         super(character);
