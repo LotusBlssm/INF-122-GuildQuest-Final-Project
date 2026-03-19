@@ -4,6 +4,8 @@ import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.interfaces.AttackMove;
 import edu.uci.inf122.guildquest.ui.TerminalGrid;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.KnightUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
 
 import java.util.List;
 
@@ -88,6 +90,10 @@ public class Knight extends PlayableCharacter implements AttackMove {
     @Override
     public void execute(TerminalGrid state, ValidMoves move) {
 
+    }
+    @Override
+    public KnightUI getUI() {
+        return KnightUI.getKnightUI(this);
     }
 
 }

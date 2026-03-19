@@ -6,11 +6,18 @@ import java.util.List;
 import edu.uci.inf122.guildquest.entities.playablecharacters.Cleric;
 
 public class ClericUI extends PlayableCharacterUI {
+    private static ClericUI singleton;
     private final Cleric character;
 
-    public ClericUI(Cleric character) {
+    private ClericUI(Cleric character) {
         super(character);
         this.character = character;
+    }
+
+    public static ClericUI getClericUI(Cleric cleric) {
+        if (singleton==null)
+            singleton = new ClericUI(cleric);
+        return singleton;
     }
 
     @Override

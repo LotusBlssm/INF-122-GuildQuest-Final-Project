@@ -401,14 +401,14 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         if (p1Choice == 1) {
             player1 = c;
             player2 = a;
-            p1UI = new ClericUI(c);
-            p2UI = new AssassinUI(a);
+            p1UI = c.getUI();
+            p2UI = a.getUI();
             page.print("Player 1 is the Cleric, player 2 is the Assassin\n");
         } else {
             player1 = a;
             player2 = c;
-            p1UI = new AssassinUI(a);
-            p2UI = new ClericUI(c);
+            p1UI = a.getUI();
+            p2UI = c.getUI();
             page.print("Player 1 is the Assassin, player 2 is the Cleric\n");
         }
         p1UI.display();

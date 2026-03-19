@@ -5,6 +5,8 @@ import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.interfaces.AttackMove;
 import edu.uci.inf122.guildquest.entities.interfaces.CardinalTravelMove;
 import edu.uci.inf122.guildquest.ui.TerminalGrid;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.AssassinUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
 
 import java.util.List;
 
@@ -77,5 +79,10 @@ public class Assassin extends PlayableCharacter implements AttackMove, CardinalT
     }
     public List<Move.ValidMoves> getMoves(){
         return moves;
+    }
+
+    @Override
+    public AssassinUI getUI() {
+        return AssassinUI.getAssassinUI(this);
     }
 }

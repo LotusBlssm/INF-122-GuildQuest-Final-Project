@@ -10,4 +10,15 @@ public abstract class PlayableCharacterUI {
     }
 
     public abstract void display();
+
+    public void displayInventory() {
+        
+        System.out.println(character.getName() + "'s Inventory:");
+        if (character.getInventory().isEmpty()) {
+            System.out.println("- Empty");
+        } else {
+            character.getInventory().forEach(item -> System.out.println("- " + item.getName()));
+        }
+        System.out.println();
+    }
 }

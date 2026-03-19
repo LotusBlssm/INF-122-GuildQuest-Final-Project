@@ -6,11 +6,19 @@ import java.util.List;
 import edu.uci.inf122.guildquest.entities.playablecharacters.Assassin;
 
 public class AssassinUI extends PlayableCharacterUI {
+    private static AssassinUI singleton;
     private final Assassin character;
 
-    public AssassinUI(Assassin character) {
+    private AssassinUI(Assassin character) {
         super(character);
         this.character = character;
+    }
+
+    public static AssassinUI getAssassinUI(Assassin character){
+        if (singleton==null)
+            singleton = new AssassinUI(character);
+        return singleton;
+
     }
 
     @Override
