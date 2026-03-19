@@ -2,11 +2,12 @@ package edu.uci.inf122.guildquest.ui;
 
 import edu.uci.inf122.guildquest.content.GameCharacter;
 import edu.uci.inf122.guildquest.content.Inventory;
-import edu.uci.inf122.guildquest.content.Item;
-import edu.uci.inf122.guildquest.content.ItemFactory;
+import edu.uci.inf122.guildquest.content.items.Item;
+import edu.uci.inf122.guildquest.content.items.ItemFactory;
 
 public class InventoryUI {
     private static final Page page = Page.getPage();
+    private static final String DEFAULT_PROMPT = "Please choose an item: ";
 
     public static void manageInventory(GameCharacter character) {
         String prompt = """
@@ -99,5 +100,26 @@ public class InventoryUI {
         character.getInventory().addItem(newItem);
         page.nextScreen();
         return newItem;
+    }
+
+    public static Item queryInventory(Inventory inventory, String extraPrompt) {
+        if (inventory.getItems().isEmpty()) {
+            page.print("Sorry, there are no items. Please exit.\n");
+            return null;
+        }
+        int i = 1;
+        StringBuilder prompt = new StringBuilder(DEFAULT_PROMPT + extraPrompt + '\n');
+        prompt.append("0 --- go back\n");
+        for (Item item : inventory.getItems()) {
+            prompt.append(i).append(" --- ").append(item.getName()).append('\n');
+            ++i;
+        }
+        int input = page.acceptIntUntil(prompt.toString(), i - 1);
+        page.nextScreen();
+        return inventory.getItems().get(input);
+    }
+
+    public static Item queryInventory(Inventory inventory) {
+        return queryInventory(inventory, "");
     }
 }

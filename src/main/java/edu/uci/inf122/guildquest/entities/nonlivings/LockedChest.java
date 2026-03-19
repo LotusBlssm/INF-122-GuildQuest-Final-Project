@@ -1,6 +1,6 @@
 package edu.uci.inf122.guildquest.entities.nonlivings;
 
-import edu.uci.inf122.guildquest.content.Item;
+import edu.uci.inf122.guildquest.content.items.Item;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
 

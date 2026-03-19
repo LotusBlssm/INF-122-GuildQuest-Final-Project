@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 // import edu.uci.inf122.guildquest.ui;
+import edu.uci.inf122.guildquest.content.items.Item;
+import edu.uci.inf122.guildquest.content.items.ItemFactory;
+import edu.uci.inf122.guildquest.content.items.SelfApplicable;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
@@ -23,8 +26,6 @@ import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 import edu.uci.inf122.guildquest.entities.nonlivings.Chest;
 import edu.uci.inf122.guildquest.ui.Page;
 import edu.uci.inf122.guildquest.ui.TerminalGrid;
-import edu.uci.inf122.guildquest.ui.playablecharacteruis.AssassinUI;
-import edu.uci.inf122.guildquest.ui.playablecharacteruis.ClericUI;
 import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
 
 // The rule: 
@@ -157,19 +158,28 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             if (input.contains("move")) {
                 if (!attemptMovePlayer(currentPlayer, input.charAt(input.length() - 1)))
                     continue;
-            } else if (input.contains("attack")) {
+            }
+            else if (input.contains("use item")){
+                if (! attemptUseItem(currentPlayer) )
+                    continue;
+            }
+            else if (input.contains("attack")) {
                 if (!attemptPlayerAttack(currentPlayer, input.charAt(input.length() - 1)))
                     continue;
-            } else if (input.contains("heal self")) {
+            }
+            else if (input.contains("heal self")) {
                 if (!attemptPlayerHealSelf(currentPlayer))
                     continue;
-            } else if (input.contains("heal")) {
+            }
+            else if (input.contains("heal")) {
                 if (!attemptPlayerHealOther(currentPlayer, input.charAt(input.length() - 1)))
                     continue;
-            } else if (input.equals("r")) {
+            }
+            else if (input.equals("r")) {
                 if (!makeHintRequest())
                     continue; // check to see if npc is nearby
-            } else
+            }
+            else
                 throw new IllegalStateException("Something went wrong with input, cannot parse");
             gridState.render();
             if (currentPlayer == player1)
@@ -186,10 +196,6 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // // if the enemy attacks the player, the player will know the enemy's
         // location.
 
-        // check if the player with the NPC is on the same grid cell as an enemy, if so,
-        // end the game with a loss
-        // if there is an NPC or Items, then interact with them (ex: pick up items, get
-        // hints from NPCs, etc.)
         // if player with no NPC is on the same grid cell as the destination, then the
         // destination location is known.
         // if the player with the NPC is on the same grid cell as the destination, then
@@ -199,6 +205,22 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // - attack player if adjacent to player with NPC
         // - if the player attacked them, the enemy can attack the player back during
         // their turn
+    }
+
+    private boolean attemptUseItem(PlayableCharacter currentPlayer) {
+        if (currentPlayer.getInventory().isEmpty()){
+            page.print("Inventory is empty, do something else.\n");
+            return false;
+        }
+        Item item = currentPlayer.getUI().promptInventory();
+        if (item==null)
+            return false;
+        if (item instanceof SelfApplicable i){
+            return i.use(currentPlayer);
+        } else{
+            page.print("have not implemented items that can be applied to others");
+            return false;
+        }
     }
 
     private boolean attemptPlayerHealSelf(PlayableCharacter p) {
@@ -260,6 +282,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     }
 
     public void acceptInput() {
+
 
     }
 
@@ -352,7 +375,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         Goblin enemy3 = new Goblin(new Name("Goblin 3"), new Health(15), new Level(2));
         enemies = new ArrayList<>(List.of(enemy1, enemy2, enemy3));
 
-        Item item1 = ItemFactory.createWeapon("blue sword", 1, "a blue sword", 6);
+        Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
         Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
         Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
         items = new ArrayList<>(List.of(item1, item2, item3));
@@ -374,8 +397,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         gridState.setCell(0, 2, player2);
 
         gridState.initializeGrid(enemies);
-//        gridState.initializeGrid(items);
-        gridState.initializeGrid(chests);
+        gridState.initializeGrid(items);
+//        gridState.initializeGrid(chests);
         gridState.initializeGrid(npcs);
     }
 
@@ -438,13 +461,19 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             default -> throw new IllegalStateException("Unexpected direction: " + direction);
         }
         GridCell targetCell = gridState.getCell(target[0], target[1]);
-        if (targetCell.hasContent() && targetCell.getContent().stream().anyMatch(e -> e instanceof Chest)) {
-            Chest chest = (Chest) targetCell.getContent().stream().filter(e -> e instanceof Chest).findFirst().get();
-            Item item = chest.take();
-            if (item != null) {
-                p.addToInventory(item);
+        if (targetCell.hasContent()) {
+            if (targetCell.getTop() instanceof Chest chest){
+                Item item = chest.take();
+                if (item != null) {
+                    p.addToInventory(item);
+                }
+                gridState.removeEntity(chest);
             }
-            gridState.removeEntity(chest);
+            else if (targetCell.getTop() instanceof Item item) {
+                currentPlayer.addToInventory(item);
+                page.print("added "+item.getName()+" to inventory\n");
+                gridState.removeEntity(item);
+            }
         }
         if (!gridState.setCellWithChecking(targetCell, p)) {
             return false;

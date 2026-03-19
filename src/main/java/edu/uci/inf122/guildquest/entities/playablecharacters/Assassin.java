@@ -14,7 +14,12 @@ public class Assassin extends PlayableCharacter implements AttackMove, CardinalT
     private static Assassin instance;
     private final DecimalAmount criticalHitChance;
     private final Amount attackPower;
-    private static final List<ValidMoves> moves = List.of(ValidMoves.TRAVEL, ValidMoves.ATTACK, ValidMoves.REQUEST_HINT);
+    private static final List<ValidMoves> moves = List.of(
+            ValidMoves.TRAVEL,
+            ValidMoves.ATTACK,
+            ValidMoves.REQUEST_HINT,
+            ValidMoves.USE_ITEM
+    );
 
     private Assassin(Name name) {
         super(name, new Health(80), new Level(1), new CharacterClass(new Name("Assassin")));

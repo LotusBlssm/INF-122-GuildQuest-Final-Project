@@ -1,5 +1,7 @@
-package edu.uci.inf122.guildquest.content;
+package edu.uci.inf122.guildquest.content.items;
 
+import edu.uci.inf122.guildquest.content.QuestEvent;
+import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
 
 import java.util.UUID;
@@ -19,5 +21,11 @@ public class QuestItem extends Item {
     @Override
     public void act() {
 
+    }
+
+    @Override
+    public boolean use(Entity user, Entity target) {
+        // look pretty
+        return true;
     }
 }

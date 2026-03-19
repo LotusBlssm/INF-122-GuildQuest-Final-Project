@@ -1,10 +1,12 @@
-package edu.uci.inf122.guildquest.content;
+package edu.uci.inf122.guildquest.content.items;
 
+import edu.uci.inf122.guildquest.content.QuestEvent;
+import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
 
 import java.util.UUID;
 
-public class Consumable extends Item {
+public abstract class Consumable extends Item{
     private QuestEvent questAssociated;
 
     public Consumable(UUID itemID, String name, int rarity, String description, QuestEvent questAssociated) {
@@ -20,4 +22,6 @@ public class Consumable extends Item {
     public void act() {
 
     }
+
+    public abstract boolean use(Entity user, Entity target);
 }

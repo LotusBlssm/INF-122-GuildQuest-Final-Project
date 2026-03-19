@@ -1,6 +1,7 @@
 package edu.uci.inf122.guildquest.api.state;
 
 import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.interfaces.Absorbable;
 import edu.uci.inf122.guildquest.entities.nonlivings.Chest;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 
@@ -83,7 +84,7 @@ public abstract class GridState implements State {
             throw new IllegalArgumentException("Invalid grid position: (" + row + ", " + col + ")");
         }
         if (grid.get(row).get(col).hasContent()) {
-            if (!grid.get(row).get(col).getContent().stream().anyMatch(entity -> entity instanceof Chest)) {
+            if (!grid.get(row).get(col).getContent().stream().anyMatch(entity -> entity instanceof Absorbable)) {
                 return false;
             }
         }

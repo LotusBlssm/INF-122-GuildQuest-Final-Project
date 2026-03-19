@@ -1,4 +1,6 @@
-package edu.uci.inf122.guildquest.content;
+package edu.uci.inf122.guildquest.content.items;
+
+import edu.uci.inf122.guildquest.content.QuestEvent;
 
 import java.util.UUID;
 
@@ -16,7 +18,7 @@ public class ItemFactory {
         return new QuestItem(UUID.randomUUID(), name, rarity, description, questAssociated);
     }
 
-    public static Consumable createConsumable(String name, int rarity, String description, QuestEvent questAssociated) {
-        return new Consumable(UUID.randomUUID(), name, rarity, description, questAssociated);
+    public static HealingPotion createHealingPotion(String name, int rarity, String description, QuestEvent questAssociated, int strength) {
+        return new HealingPotion(UUID.randomUUID(), name, rarity, description, questAssociated, strength);
     }
 }

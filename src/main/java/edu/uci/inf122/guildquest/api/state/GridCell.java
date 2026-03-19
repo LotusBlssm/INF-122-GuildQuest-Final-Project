@@ -45,4 +45,8 @@ public class GridCell {
         if (isEmpty()) return false;
         return content.get(0) instanceof Absorbable;
     }
+    public Entity getTop(){
+        if (isEmpty()) return null;
+        else return content.get(0);
+    }
 }
