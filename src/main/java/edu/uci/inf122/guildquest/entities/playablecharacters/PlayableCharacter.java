@@ -4,6 +4,7 @@ import edu.uci.inf122.guildquest.content.Inventory;
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.npcs.NPC;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
 
 import java.util.List;
 
@@ -91,5 +92,7 @@ public abstract class PlayableCharacter extends Entity {
     }
 
     public abstract List<Move.ValidMoves> getMoves();
+
+    public abstract PlayableCharacterUI getUI();
 
 }

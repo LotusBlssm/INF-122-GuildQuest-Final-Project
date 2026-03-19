@@ -4,6 +4,9 @@ import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.interfaces.CanHealOther;
 import edu.uci.inf122.guildquest.entities.interfaces.CanHealSelf;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.ClericUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.KnightUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
 
 import java.util.List;
 
@@ -74,5 +77,9 @@ public class Cleric extends PlayableCharacter implements CanHealSelf, CanHealOth
     @Override
     public void heal(int amount) {
 
+    }
+    @Override
+    public ClericUI getUI() {
+        return ClericUI.getClericUI(this);
     }
 }

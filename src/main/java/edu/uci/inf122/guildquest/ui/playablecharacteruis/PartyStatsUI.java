@@ -82,8 +82,9 @@ public class PartyStatsUI {
 
         printBorder(statColWidth, valueColWidths);
 
-        character1.displayInventory();
-        character2.displayInventory();
+        for (PlayableCharacter c : characters){
+            c.getUI().display();
+        }
     }
 
     private Map<String, String> extractStats(PlayableCharacter character) {

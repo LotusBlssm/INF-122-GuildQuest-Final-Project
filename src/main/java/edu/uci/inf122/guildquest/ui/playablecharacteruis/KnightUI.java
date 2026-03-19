@@ -6,9 +6,16 @@ import java.util.List;
 import edu.uci.inf122.guildquest.entities.playablecharacters.Knight;
 
 public class KnightUI extends PlayableCharacterUI {
+    private static KnightUI singleton;
     private final Knight character;
 
-    public KnightUI(Knight character) {
+    public static KnightUI getKnightUI(Knight character){
+        if (singleton==null){
+            return new KnightUI(character);
+        } else return singleton;
+
+    }
+    private KnightUI(Knight character) {
         super(character);
         this.character = character;
     }
