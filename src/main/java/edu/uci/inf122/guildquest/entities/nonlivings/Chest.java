@@ -46,7 +46,6 @@ public class Chest extends Nonliving implements Absorbable {
     /**
      * attempt to take from the chest
      *
-     * @param c the character
      */
     public Item take() {
         if (status.isClosed()) {
