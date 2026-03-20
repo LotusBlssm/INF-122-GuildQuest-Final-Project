@@ -88,6 +88,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     private List<Entity> npcs;
     private final static Page page = Page.getPage();
     private PlayableCharacter currentPlayer;
+    private List<User> players;
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
@@ -102,6 +103,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     public EscortAdventure(List<Realm> realms, List<Entity> entities, List<WinCondition> winCondition,
             List<User> players) {
         super(realms, entities, winCondition, players);
+        this.players = players;
         gridState = new TerminalGrid(6, 6);
         if (winCondition.get(0) instanceof GetToTargetXYWithPrincessCondition xyp){
             condition=xyp;
@@ -109,8 +111,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         else
             condition=null; // temp
         // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
-         player1 = Assassin.getInstance(new Name("assassin")); // placeholder
-         player2 = Cleric.getInstance(new Name("cleric")); //
+        // player1 = Assassin.getInstance(new Name("assassin")); // placeholder
+        // player2 = Cleric.getInstance(new Name(players.get(1).getName())); //
         // placeholder
     }
 
@@ -421,8 +423,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         gridState.setCell(0, 2, player2);
 
         gridState.initializeGrid(enemies);
-        gridState.initializeGrid(items);
-//        gridState.initializeGrid(chests);
+//        gridState.initializeGrid(items);
+        gridState.initializeGrid(chests);
         gridState.initializeGrid(npcs);
     }
 
@@ -437,25 +439,23 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      * Initialize user to be either Assassin or Cleric
      */
     public void initializeUser() {
-        // logic to set up the user, which user is with the NPC, etc.
-        // ask UI which characters they would like to be.
-        int p1Choice = page.acceptIntUntil("""
-                Player 1, would you like to be an Assassin, or a Cleric?
-                0 - Assassin
-                1 - Cleric
-                """, 1);
-        PlayableCharacterUI p1UI;
-        PlayableCharacterUI p2UI;
-        Cleric c = Cleric.getInstance(new Name("Mary"));
-        Assassin a = Assassin.getInstance(new Name("Dante"));
+        String p1Name = (players != null && !players.isEmpty()) ? players.get(0).getUsername() : "Player 1";
+        String p2Name = (players != null && players.size() > 1) ? players.get(1).getUsername() : "Player 2";
+
+        int p1Choice = page.acceptIntUntil(
+                p1Name + ", would you like to be an Assassin, or a Cleric?\n"
+                + "0 - Assassin\n"
+                + "1 - Cleric\n", 1);
+        Cleric c = Cleric.getInstance(new Name(p1Choice == 1 ? p1Name : p2Name));
+        Assassin a = Assassin.getInstance(new Name(p1Choice == 0 ? p1Name : p2Name));
         if (p1Choice == 1) {
             player1 = c;
             player2 = a;
-            page.print("Player 1 is the Cleric, player 2 is the Assassin\n");
+            page.print(p1Name + " is the Cleric, " + p2Name + " is the Assassin\n");
         } else {
             player1 = a;
             player2 = c;
-            page.print("Player 1 is the Assassin, player 2 is the Cleric\n");
+            page.print(p1Name + " is the Assassin, " + p2Name + " is the Cleric\n");
         }
 
         PartyStatsUI partyStats = new PartyStatsUI(player1, player2);
@@ -554,33 +554,13 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      * @param args the input arguments
      */
     public static void main(String[] args) {
-        Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
-        Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
-        Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
-        Princess princess = new Princess(new Name("princess"), new Health(10), new Amount(2));
-
-        List<WinCondition> winConditions = List.of(
-                new GetToTargetXYWithPrincessCondition(1, 1)
-        );
-
-        List<Entity> entities = List.of(
-            princess,
-            new Goblin(new Name("Goblin 1"), new Health(10), new Level(1)),
-            new Goblin(new Name("Goblin 2"), new Health(12), new Level(1)),
-            new Goblin(new Name("Goblin 3"), new Health(15), new Level(2)),
-            item1, item2, item3,
-            new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword")),
-            new Chest(new Name("chest2"), item2, new Text("a chest with a red stick")),
-            new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe")),
-            new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10)),
-            new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100))
-        );
+        List<WinCondition> winConditions = List.of(new TimeLimitCondition(10));
 
         EscortAdventure adventure = new EscortAdventure(
-                null,
-                entities,
+                new ArrayList<>(),
+                new ArrayList<>(),
                 winConditions,
-                null);
+                new ArrayList<>());
 
         adventure.play();
     }

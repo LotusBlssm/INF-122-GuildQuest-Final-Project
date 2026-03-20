@@ -1,12 +1,12 @@
 package edu.uci.inf122.guildquest.ui;
 
+import edu.uci.inf122.guildquest.api.win_conditions.GetToTargetXYWithPrincessCondition;
 import edu.uci.inf122.guildquest.content.User;
 import edu.uci.inf122.guildquest.content.UserFactory;
 import edu.uci.inf122.guildquest.content.RealmFactory;
 import edu.uci.inf122.guildquest.content.Realm;
 import edu.uci.inf122.guildquest.content.TimeRule;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,12 +14,17 @@ import edu.uci.inf122.guildquest.adventures.EscortAdventure;
 import edu.uci.inf122.guildquest.api.win_conditions.RaidClearCondition;
 import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
+import edu.uci.inf122.guildquest.adventures.RaidGridState;
+import edu.uci.inf122.guildquest.adventures.TimedRaidAdventure;
+import edu.uci.inf122.guildquest.content.items.Item;
+import edu.uci.inf122.guildquest.content.items.ItemFactory;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
-import edu.uci.inf122.guildquest.engine.RaidGridState;
-import edu.uci.inf122.guildquest.engine.TimedRaidAdventure;
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
+import edu.uci.inf122.guildquest.entities.nonlivings.Chest;
+import edu.uci.inf122.guildquest.entities.npcs.Ferryman;
 import edu.uci.inf122.guildquest.entities.npcs.Goblin;
+import edu.uci.inf122.guildquest.entities.npcs.Princess;
 import edu.uci.inf122.guildquest.entities.playablecharacters.*;
 
 import edu.uci.inf122.guildquest.ui.Page;
@@ -52,13 +57,56 @@ public class AdventureUI {
             i = page.acceptIntUntil(prompt, 2);
             switch (i) {
                 case 0 -> System.out.print("");
-                case 1 -> {
-                    // TODO: Escort Adventure
-                    System.out.println("Escort Adventure is not yet available.");
-                }
+                case 1 -> playEscortAdventure(user);
                 case 2 -> playTimedRaid(user);
             }
         }
+    }
+
+    private static void playEscortAdventure(User user) {
+        Page page = Page.getPage();
+        page.nextScreen();
+        String player2Name = page.acceptStr("Enter Player 2 username: ");
+        User player2 = UserFactory.createUser(player2Name);
+        List<User> players = List.of(user, player2);
+
+        List<WinCondition> winConditions = new ArrayList<>();
+
+        winConditions.add(new GetToTargetXYWithPrincessCondition(4,4));
+        winConditions.add(new TimeLimitCondition(10));
+
+        Realm realm = RealmFactory.createRealm(
+                "Escort Realm", "A dangerous escort mission",
+                new TimeRule(0, 1.0), 6, 6);
+
+        EscortAdventure adventure = new EscortAdventure(
+                List.of(realm),
+                EscortDefaultEntities(),
+                winConditions,
+                players);
+
+        page.nextScreen();
+        adventure.play();
+    }
+
+    private static List<Entity> EscortDefaultEntities(){
+        Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
+        Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
+        Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
+        Princess princess = new Princess(new Name("princess"), new Health(10), new Amount(2));
+
+        return List.of(
+                princess,
+                new Goblin(new Name("Goblin 1"), new Health(10), new Level(1)),
+                new Goblin(new Name("Goblin 2"), new Health(12), new Level(1)),
+                new Goblin(new Name("Goblin 3"), new Health(15), new Level(2)),
+                item1, item2, item3,
+                new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword")),
+                new Chest(new Name("chest2"), item2, new Text("a chest with a red stick")),
+                new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe")),
+                new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10)),
+                new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100))
+        );
     }
 
     private static void playTimedRaid(User user) {
