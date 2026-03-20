@@ -1,4 +1,4 @@
-package edu.uci.inf122.guildquest.content;
+package edu.uci.inf122.guildquest.content.items;
 
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
@@ -28,4 +28,6 @@ public abstract class Item extends Entity {
     public String getDescription() {
         return description;
     }
+
+    public abstract boolean use(Entity user, Entity target);
 }

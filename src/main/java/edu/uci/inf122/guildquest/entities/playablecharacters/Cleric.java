@@ -15,7 +15,10 @@ public class Cleric extends PlayableCharacter implements CanHealSelf, CanHealOth
     private final DecimalAmount healingPower;
 
     private static final List<Move.ValidMoves> moves = List.of(Move.ValidMoves.TRAVEL, Move.ValidMoves.HEAL_OTHER,
-        Move.ValidMoves.HEAL_SELF, Move.ValidMoves.REQUEST_HINT);
+        Move.ValidMoves.HEAL_SELF,
+        Move.ValidMoves.USE_ITEM,
+        Move.ValidMoves.REQUEST_HINT
+    );
 
     protected Cleric(Name name) {
         super(name, new Health(90), new Level(1), new CharacterClass("Cleric"));

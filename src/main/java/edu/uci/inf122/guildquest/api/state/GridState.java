@@ -1,6 +1,8 @@
 package edu.uci.inf122.guildquest.api.state;
 
+import edu.uci.inf122.guildquest.api.Status;
 import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.interfaces.Absorbable;
 import edu.uci.inf122.guildquest.entities.nonlivings.Chest;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 
@@ -75,7 +77,7 @@ public abstract class GridState implements State {
      * @return whether operation succeeded or not
      */
     // Helper method to get a specific cell
-    public boolean setCellWithChecking(GridCell targetCell, Entity e) {
+    public Status setCellWithChecking(GridCell targetCell, Entity e) {
         int[] loc = getLocationCords(targetCell);
         int row = loc[0];
         int col = loc[1];
@@ -83,12 +85,12 @@ public abstract class GridState implements State {
             throw new IllegalArgumentException("Invalid grid position: (" + row + ", " + col + ")");
         }
         if (grid.get(row).get(col).hasContent()) {
-            if (!grid.get(row).get(col).getContent().stream().anyMatch(entity -> entity instanceof Chest)) {
-                return false;
+            if (!grid.get(row).get(col).getContent().stream().anyMatch(entity -> entity instanceof Absorbable)) {
+                return new Status(Status.Option.FAIL, "You cannot walk onto this cell");
             }
         }
         grid.get(row).get(col).setContent(e);
-        return true;
+        return new Status(Status.Option.SUCCESS);
     }
 
     public boolean canMove(Entity e, char direction) {

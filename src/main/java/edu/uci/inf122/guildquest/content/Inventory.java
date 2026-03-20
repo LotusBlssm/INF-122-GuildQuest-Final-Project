@@ -1,5 +1,7 @@
 package edu.uci.inf122.guildquest.content;
 
+import edu.uci.inf122.guildquest.content.items.Item;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.function.Consumer;

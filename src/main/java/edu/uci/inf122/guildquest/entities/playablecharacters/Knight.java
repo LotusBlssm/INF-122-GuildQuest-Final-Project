@@ -15,7 +15,11 @@ public class Knight extends PlayableCharacter implements AttackMove {
     private final DecimalAmount damageReductionMultiplier;
     private final DecimalAmount healingMultiplier;
     private final Amount attackPower;
-    private static final List<ValidMoves> moves = List.of(ValidMoves.TRAVEL, ValidMoves.ATTACK);
+    private static final List<ValidMoves> moves = List.of(
+            ValidMoves.TRAVEL,
+            ValidMoves.ATTACK,
+            ValidMoves.USE_ITEM
+    );
 
     private Knight(Name name) {
         super(name, new Health(100), new Level(1), new CharacterClass("Knight"));

@@ -1,6 +1,7 @@
 package edu.uci.inf122.guildquest.engine;
 
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
+import edu.uci.inf122.guildquest.api.Status;
 import edu.uci.inf122.guildquest.api.state.State;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 import edu.uci.inf122.guildquest.content.Realm;
@@ -19,9 +20,9 @@ public abstract class MiniAdventure {
 
     public abstract void play();
 
-    public abstract void acceptInput();
+    public abstract Status acceptInput();
 
-    public abstract void advanceCycle();
+    public abstract Status advanceCycle();
 
     public abstract AdventureSnapshot saveSnapshot();
 

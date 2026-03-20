@@ -1,10 +1,12 @@
-package edu.uci.inf122.guildquest.content;
+package edu.uci.inf122.guildquest.content.items;
 
+import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
+import edu.uci.inf122.guildquest.entities.interfaces.Absorbable;
 
 import java.util.UUID;
 
-public class Weapon extends Item {
+public class Weapon extends Item implements Absorbable {
     private int damage;
 
     public Weapon(UUID itemID, String name, int rarity, String description, int damage) {
@@ -19,5 +21,10 @@ public class Weapon extends Item {
     @Override
     public void act() {
 
+    }
+
+    @Override
+    public boolean use(Entity user, Entity target) {
+        return false;
     }
 }
