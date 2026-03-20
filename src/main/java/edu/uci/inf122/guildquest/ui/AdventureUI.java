@@ -81,7 +81,7 @@ public class AdventureUI {
 
         EscortAdventure adventure = new EscortAdventure(
                 List.of(realm),
-                EscortDefaultEntities(),
+                EscortAdventure.defaultEntities(),
                 winConditions,
                 players);
 
@@ -89,25 +89,7 @@ public class AdventureUI {
         adventure.play();
     }
 
-    private static List<Entity> EscortDefaultEntities(){
-        Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
-        Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
-        Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
-        Princess princess = new Princess(new Name("princess"), new Health(10), new Amount(2));
 
-        return List.of(
-                princess,
-                new Goblin(new Name("Goblin 1"), new Health(10), new Level(1)),
-                new Goblin(new Name("Goblin 2"), new Health(12), new Level(1)),
-                new Goblin(new Name("Goblin 3"), new Health(15), new Level(2)),
-                item1, item2, item3,
-                new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword")),
-                new Chest(new Name("chest2"), item2, new Text("a chest with a red stick")),
-                new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe")),
-                new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10)),
-                new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100))
-        );
-    }
 
     private static void playTimedRaid(User user) {
         Page page = Page.getPage();

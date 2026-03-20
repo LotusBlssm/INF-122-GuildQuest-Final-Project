@@ -6,11 +6,11 @@ import static edu.uci.inf122.guildquest.ui.UserUI.page;
 
 public class Ferryman extends NPC {
     // Note: The destination and fare are currently placeholders.
-    private Place destination;
+    private XYPlace destination;
     private Amount fare;
 
 
-    public Ferryman(Name name, Place destination, Amount fare) {
+    public Ferryman(Name name, XYPlace destination, Amount fare) {
         super(name, Health.createDefault());
         this.destination = destination;
         this.fare = fare;

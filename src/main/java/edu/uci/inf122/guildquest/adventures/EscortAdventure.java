@@ -89,6 +89,26 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     private final static Page page = Page.getPage();
     private PlayableCharacter currentPlayer;
     private List<User> players;
+
+    public static List<Entity> defaultEntities() {
+        Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
+        Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
+        Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
+        Princess princess = new Princess(new Name("princess"), new Health(10), new Amount(2));
+
+        return List.of(
+                princess,
+                new Goblin(new Name("Goblin 1"), new Health(10), new Level(1)),
+                new Goblin(new Name("Goblin 2"), new Health(12), new Level(1)),
+                new Goblin(new Name("Goblin 3"), new Health(15), new Level(2)),
+                item1, item2, item3,
+                new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword")),
+                new Chest(new Name("chest2"), item2, new Text("a chest with a red stick")),
+                new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe")),
+                new Ferryman(new Name("John Ferryman"), new XYPlace(new Name("Destination"),4,4), new Amount(10)),
+                new Ferryman(new Name("Expensive Ferryman"), new XYPlace(new Name("Destination"),4,4), new Amount(100))
+        );
+    }
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
@@ -524,7 +544,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             // tell "Far....."
 //            page.print("destination is far...\n");
         }
-        return new Status(Status.Option.SUCCESS, "Destination is far...");
+        return new Status(Status.Option.FAIL, "Unimplemented as of yet.");
     }
 
     /**
