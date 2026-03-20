@@ -12,4 +12,9 @@ public class Text {
     public Text addWithSpace(Text other){
         return text.isEmpty() ? other : new Text(text+' '+other.text);
     }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

@@ -3,15 +3,12 @@ package edu.uci.inf122.guildquest.adventures;
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
 import edu.uci.inf122.guildquest.api.Status;
 import edu.uci.inf122.guildquest.api.state.GridCell;
-import edu.uci.inf122.guildquest.api.win_conditions.MultipleStaysAliveCondition;
-import edu.uci.inf122.guildquest.api.win_conditions.StaysAliveCondition;
-import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
+import edu.uci.inf122.guildquest.api.win_conditions.*;
 import edu.uci.inf122.guildquest.content.*;
 
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
-import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 // import edu.uci.inf122.guildquest.ui;
 import edu.uci.inf122.guildquest.content.items.Item;
 import edu.uci.inf122.guildquest.content.items.ItemFactory;
@@ -82,6 +79,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     // private GridUI gridUI;
     // save/serialize
     private final TerminalGrid gridState;
+    private final GetToTargetXYWithPrincessCondition condition;
     private PlayableCharacter player1;
     private PlayableCharacter player2;
     private List<Entity> enemies;
@@ -105,6 +103,11 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             List<User> players) {
         super(realms, entities, winCondition, players);
         gridState = new TerminalGrid(6, 6);
+        if (winCondition.get(0) instanceof GetToTargetXYWithPrincessCondition xyp){
+            condition=xyp;
+        }
+        else
+            condition=null; // temp
         // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
          player1 = Assassin.getInstance(new Name("assassin")); // placeholder
          player2 = Cleric.getInstance(new Name("cleric")); //
@@ -495,7 +498,12 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 page.print("You are now escorting the princess\n");
             }
         }
-        return gridState.setCellWithChecking(targetCell, p);
+        Status status =  gridState.setCellWithChecking(targetCell, p);
+        if (!status.isFail()){
+            int[] pos = gridState.getLocationCords(targetCell);
+            condition.updateCondition(pos[0], pos[1], currentPlayer);
+        }
+        return status;
     }
 
     /**
@@ -530,6 +538,9 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             if (wc.isLost()){
                 return new Status(Status.Option.DONE, wc.loseMessage().toString());
             }
+            if (wc.isWon()){
+                return new Status(Status.Option.DONE, wc.winMessage().toString());
+            }
         }
         if (player1.isDead() || player2.isDead()) {
             return new Status(Status.Option.DONE, "You died! You lost.");
@@ -549,7 +560,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         Princess princess = new Princess(new Name("princess"), new Health(10), new Amount(2));
 
         List<WinCondition> winConditions = List.of(
-                new StaysAliveCondition(princess)
+                new GetToTargetXYWithPrincessCondition(1, 1)
         );
 
         List<Entity> entities = List.of(
