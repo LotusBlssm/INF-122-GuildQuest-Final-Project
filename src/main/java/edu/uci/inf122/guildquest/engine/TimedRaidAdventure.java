@@ -14,16 +14,17 @@ import edu.uci.inf122.guildquest.entities.npcs.Hostile;
 import edu.uci.inf122.guildquest.entities.npcs.NPC;
 import edu.uci.inf122.guildquest.entities.playablecharacters.PlayableCharacter;
 
+import edu.uci.inf122.guildquest.ui.Page;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class TimedRaidAdventure extends MiniAdventure {
     private TurnTimer turnTimer;
     private int currentPlayerIndex;
     private int turnNumber;
     private boolean gameOver;
-    private Scanner scanner;
+    private Page page;
     private GridState grid;
     private List<PlayableCharacter> playerCharacters;
     private int[][] playerPositions; // [playerIndex][0=row, 1=col]
@@ -44,7 +45,7 @@ public class TimedRaidAdventure extends MiniAdventure {
         this.currentPlayerIndex = 0;
         this.turnNumber = 0;
         this.gameOver = false;
-        this.scanner = new Scanner(System.in);
+        this.page = Page.getPage();
         this.grid = (GridState) state;
         this.playerCharacters = playerCharacters;
         this.playerPositions = new int[players.size()][2];
@@ -56,7 +57,7 @@ public class TimedRaidAdventure extends MiniAdventure {
     }
 
     public String getDescription() {
-        return "A timed raid where two players compete under a turn timer.";
+        return "A timed raid where players compete under a turn timer.";
     }
 
     @Override
@@ -111,17 +112,18 @@ public class TimedRaidAdventure extends MiniAdventure {
         System.out.println("Commands: move <n/s/e/w>, attack <n/s/e/w>, open <n/s/e/w>, end");
         System.out.print("> ");
 
-        pendingCommand = scanner.nextLine().trim().toLowerCase();
+        pendingCommand = page.acceptStr("").trim().toLowerCase();
         return new Status(Status.Option.CONTINUE);
     }
 
     @Override
-    public void advanceCycle() {
+    public Status advanceCycle() {
         turnTimer.endTurn();
         if (!checkGameOver()) {
             turnNumber++;
             swapTurn();
         }
+        return new Status(Status.Option.CONTINUE);
     }
 
     @Override
@@ -138,39 +140,41 @@ public class TimedRaidAdventure extends MiniAdventure {
         String[] parts = command.split("\\s+");
         String action = parts[0];
 
-        switch (action) {
+        return switch (action) {
             case "n", "s", "e", "w" -> handleMove(action);
             case "move" -> {
                 if (parts.length < 2) {
                     System.out.println("Usage: move <n/s/e/w>");
-                    return false;
+                    yield false;
                 }
-                handleMove(parts[1]);
+                yield handleMove(parts[1]);
             }
             case "attack" -> {
                 if (parts.length < 2) {
                     System.out.println("Usage: attack <n/s/e/w>");
-                    return false;
+                    yield false;
                 }
-                handleAttack(parts[1]);
+                yield handleAttack(parts[1]);
             }
             case "open" -> {
                 if (parts.length < 2) {
                     System.out.println("Usage: open <n/s/e/w>");
-                    return false;
+                    yield false;
                 }
-                handleOpen(parts[1]);
+                yield handleOpen(parts[1]);
             }
-            case "end" -> System.out.println("Turn ended.");
+            case "end" -> {
+                System.out.println("Turn ended.");
+                yield true;
+            }
             default -> {
                 System.out.println("Unknown command: " + action);
-                return false;
+                yield false;
             }
-        }
-        return true;
+        };
     }
 
-    private void handleMove(String direction) {
+    private boolean handleMove(String direction) {
         int[] current = playerPositions[currentPlayerIndex];
         int newRow = current[0];
         int newCol = current[1];
@@ -182,19 +186,19 @@ public class TimedRaidAdventure extends MiniAdventure {
             case "w" -> newCol--;
             default -> {
                 System.out.println("Invalid direction. Use n/s/e/w.");
-                return;
+                return false;
             }
         }
 
         if (!grid.isValidPosition(newRow, newCol)) {
             System.out.println("Can't move there — out of bounds.");
-            return;
+            return false;
         }
 
         GridCell targetCell = grid.getCell(newRow, newCol);
         if (!targetCell.isEmpty()) {
             System.out.println("That cell is occupied.");
-            return;
+            return false;
         }
 
         PlayableCharacter pc = playerCharacters.get(currentPlayerIndex);
@@ -204,9 +208,10 @@ public class TimedRaidAdventure extends MiniAdventure {
         current[1] = newCol;
 
         System.out.println(pc.getName() + " moved " + directionName(direction) + ".");
+        return true;
     }
 
-    private void handleAttack(String direction) {
+    private boolean handleAttack(String direction) {
         int[] current = playerPositions[currentPlayerIndex];
         int targetRow = current[0];
         int targetCol = current[1];
@@ -218,28 +223,29 @@ public class TimedRaidAdventure extends MiniAdventure {
             case "w" -> targetCol--;
             default -> {
                 System.out.println("Invalid direction. Use n/s/e/w.");
-                return;
+                return false;
             }
         }
 
         if (!grid.isValidPosition(targetRow, targetCol)) {
             System.out.println("Nothing to attack there.");
-            return;
+            return false;
         }
 
         GridCell targetCell = grid.getCell(targetRow, targetCol);
         if (targetCell.isEmpty()) {
             System.out.println("No entity in that direction.");
-            return;
+            return false;
         }
 
         PlayableCharacter pc = playerCharacters.get(currentPlayerIndex);
         Entity target = targetCell.getContent().get(0);
 
         pc.attack(target);
+        return true;
     }
 
-    private void handleOpen(String direction) {
+    private boolean handleOpen(String direction) {
         int[] current = playerPositions[currentPlayerIndex];
         int targetRow = current[0];
         int targetCol = current[1];
@@ -251,25 +257,26 @@ public class TimedRaidAdventure extends MiniAdventure {
             case "w" -> targetCol--;
             default -> {
                 System.out.println("Invalid direction. Use n/s/e/w.");
-                return;
+                return false;
             }
         }
 
         if (!grid.isValidPosition(targetRow, targetCol)) {
             System.out.println("Nothing to open there.");
-            return;
+            return false;
         }
 
         GridCell targetCell = grid.getCell(targetRow, targetCol);
         if (targetCell.isEmpty()) {
             System.out.println("Nothing in that direction.");
-            return;
+            return false;
         }
 
         Entity target = targetCell.getContent().get(0);
         // TODO: chest interaction, loot items, etc.
         System.out.println("Interacting with " + target.getName() + "...");
         target.act();
+        return true;
     }
 
     private void renderGrid() {
@@ -328,7 +335,7 @@ public class TimedRaidAdventure extends MiniAdventure {
         for (int i = 0; i < players.size(); i++) {
             PlayableCharacter pc = playerCharacters.get(i);
             String marker = (i == currentPlayerIndex) ? " <<" : "";
-            System.out.println("  " + players.get(i).getUsername()
+            System.out.println("  [P" + (i + 1) + "] " + players.get(i).getUsername()
                     + " (" + pc.getName() + ") HP:" + pc.getHealth()
                     + " | Time: " + turnTimer.getSecondsRemaining(i) + "s" + marker);
         }
