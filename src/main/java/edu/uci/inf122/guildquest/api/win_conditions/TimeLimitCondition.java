@@ -3,41 +3,46 @@ package edu.uci.inf122.guildquest.api.win_conditions;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
 
-import java.sql.Time;
-
 public class TimeLimitCondition extends WinCondition {
-    private Time timeLeft;
-    private Time timeSpent;
-    public TimeLimitCondition(Time timeLeft){
-        this.timeSpent=timeLeft;
-        this.timeSpent=new Time(0);
+    private int timeLimitMinutes;
+    private int timeElapsedMinutes;
+
+    public TimeLimitCondition(int timeLimitMinutes) {
+        if (timeLimitMinutes <= 0) {
+            throw new IllegalArgumentException("Time limit must be positive");
+        }
+        this.timeLimitMinutes = timeLimitMinutes;
+        this.timeElapsedMinutes = 0;
     }
+
     @Override
     public boolean isWon() {
         return false;
     }
+    @Override
+    public boolean isLost() {
+        return timeElapsedMinutes >= timeLimitMinutes;
+    }
 
     @Override
     public Text loseMessage() {
-        return null;
+        return new Text("You did not finish within the time");
     }
 
     @Override
     public Text winMessage() {
-        return null;
+        return new Text("You finished within the time!");
     }
 
-    public void updateCondition(Time timeSpent){
-        // support functionality for both adding time and decrementing time
-        long timeDiff = timeLeft.getTime() - timeSpent.getTime();
-        timeLeft = new Time(timeLeft.getTime() - timeDiff);
-        this.timeSpent = new Time(timeSpent.getTime() + timeDiff);
+    public void updateCondition(int minutesToAdd) {
+        timeElapsedMinutes += minutesToAdd;
     }
 
-    public Time getTimeSpent() {
-        return timeSpent;
+    public int getTimeLeftMinutes() {
+        return timeLimitMinutes - timeElapsedMinutes;
     }
-    public Time getTimeLeft() {
-        return timeLeft;
+
+    public int getTimeElapsedMinutes() {
+        return timeElapsedMinutes;
     }
 }

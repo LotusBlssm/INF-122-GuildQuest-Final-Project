@@ -67,13 +67,13 @@ public class Health {
         return health;
     }
 
-    public static Health createDefault(){
-        return new Health(HEALTH_DEFAULT, HEALTH_DEFAULT);
-    }
-
     @Override
     public String toString() {
-        return Integer.toString(health);
+        return health + "/" + capacity;
+    }
+
+    public static Health createDefault(){
+        return new Health(HEALTH_DEFAULT, HEALTH_DEFAULT);
     }
 
     public boolean isFull() {
