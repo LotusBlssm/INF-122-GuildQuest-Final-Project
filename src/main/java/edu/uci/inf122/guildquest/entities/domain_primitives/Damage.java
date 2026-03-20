@@ -18,14 +18,15 @@ public class Damage {
         return damage;
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(damage.getCount());
+    }
+
     public Damage multiply(DecimalAmount i) {
         return new Damage(new Amount((int)Math.floor(
                 damage.getCount() + i.getCount()
         )));
     }
 
-    @Override
-    public String toString() {
-        return damage.toString();
-    }
 }

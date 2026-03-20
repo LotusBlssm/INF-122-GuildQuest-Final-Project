@@ -1,14 +1,26 @@
 package edu.uci.inf122.guildquest.ui;
 
 import edu.uci.inf122.guildquest.content.User;
+import edu.uci.inf122.guildquest.content.UserFactory;
+import edu.uci.inf122.guildquest.content.RealmFactory;
+import edu.uci.inf122.guildquest.content.Realm;
+import edu.uci.inf122.guildquest.content.TimeRule;
 
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.uci.inf122.guildquest.adventures.EscortAdventure;
+import edu.uci.inf122.guildquest.api.win_conditions.RaidClearCondition;
 import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
+import edu.uci.inf122.guildquest.engine.RaidGridState;
+import edu.uci.inf122.guildquest.engine.TimedRaidAdventure;
+import edu.uci.inf122.guildquest.entities.Entity;
+import edu.uci.inf122.guildquest.entities.domain_primitives.*;
+import edu.uci.inf122.guildquest.entities.npcs.Goblin;
+import edu.uci.inf122.guildquest.entities.playablecharacters.*;
 
 import edu.uci.inf122.guildquest.ui.Page;
 
@@ -23,7 +35,7 @@ public class AdventureUI {
         adventure.play();
     }
 
-    public static void displayOptions(User user){
+    public static void displayOptions(User user) {
         Page page = Page.getPage();
         page.nextScreen();
         String prompt = """
@@ -31,36 +43,91 @@ public class AdventureUI {
 
                 1 --- Play Escort Adventure
                 2 --- Play Timed Raid Adventure
-                
+
                 0 --- exit
                 """;
 
         int i = -1;
-        while (i != 0){
+        while (i != 0) {
             i = page.acceptIntUntil(prompt, 2);
-            switch (i){
+            switch (i) {
                 case 0 -> System.out.print("");
                 case 1 -> {
-                    // Needs Implementation
-                    System.out.println("Playing Escort Adventure");
-
-                    List<WinCondition> winConditions = List.of(new TimeLimitCondition(new Time(2)));
-
-                    MiniAdventure adventure = new EscortAdventure(
-                        null,
-                        null,
-                        winConditions,
-                        null);
-                    AdventureUI ui = new AdventureUI(adventure);
-                    
-                    page.nextScreen();
-                    ui.start();
+                    // TODO: Escort Adventure
+                    System.out.println("Escort Adventure is not yet available.");
                 }
-                case 2 -> {
-                    // Needs Implementation
-                    System.out.println("Playing adventure 2 (Placeholder)");
+                case 2 -> playTimedRaid(user);
+            }
+        }
+    }
+
+    private static void playTimedRaid(User user) {
+        Page page = Page.getPage();
+        page.nextScreen();
+        int playerCount = page.acceptIntUntil(
+                "How many players? (1-3)\n", 3);
+        if (playerCount == 0) return;
+
+        List<User> raidPlayers = new ArrayList<>();
+        raidPlayers.add(user);
+        for (int p = 2; p <= playerCount; p++) {
+            String name = page.acceptStr("Enter Player " + p + " username: ");
+            raidPlayers.add(UserFactory.createUser(name));
+        }
+
+        List<Boolean> classTaken = new ArrayList<>(List.of(false, false, false));
+        List<PlayableCharacter> raidCharacters = new ArrayList<>();
+        for (int p = 0; p < playerCount; p++) {
+            String classPrompt = raidPlayers.get(p).getUsername()
+                    + ", choose your class:\n";
+            if (!classTaken.get(0)) classPrompt += "1 --- Knight\n";
+            if (!classTaken.get(1)) classPrompt += "2 --- Assassin\n";
+            if (!classTaken.get(2)) classPrompt += "3 --- Cleric\n";
+
+            int classChoice = 0;
+            boolean valid = false;
+            while (!valid) {
+                classChoice = page.acceptIntUntil(classPrompt, 3);
+                if (classChoice >= 1 && classChoice <= 3
+                        && !classTaken.get(classChoice - 1)) {
+                    valid = true;
+                } else if (classChoice >= 1 && classChoice <= 3) {
+                    System.out.println("That class is already taken.");
+                } else {
+                    System.out.println("Invalid choice. Please select an available class.");
                 }
             }
-        }   
+            classTaken.set(classChoice - 1, true);
+            String pcName = raidPlayers.get(p).getUsername();
+            switch (classChoice) {
+                case 1 -> raidCharacters.add(Knight.getInstance(new Name(pcName)));
+                case 2 -> raidCharacters.add(Assassin.getInstance(new Name(pcName)));
+                case 3 -> raidCharacters.add(Cleric.getInstance(new Name(pcName)));
+            }
+        }
+
+        Goblin g1 = new Goblin(new Name("Grak"), new Health(30, 30), new Level(1));
+        Goblin g2 = new Goblin(new Name("Snik"), new Health(20, 20), new Level(1));
+        Goblin g3 = new Goblin(new Name("Brug"), new Health(40, 40), new Level(2));
+        List<Entity> raidEntities = new ArrayList<>(List.of(g1, g2, g3));
+
+        RaidGridState raidGrid = new RaidGridState(10, 10);
+        raidGrid.setCell(3, 4, g1);
+        raidGrid.setCell(5, 7, g2);
+        raidGrid.setCell(7, 2, g3);
+
+        Realm raidRealm = RealmFactory.createRealm(
+                "Raid Dungeon", "A dark dungeon",
+                new TimeRule(0, 1.0), 10, 10);
+
+        List<WinCondition> raidWinConditions = new ArrayList<>();
+        raidWinConditions.add(new RaidClearCondition(raidEntities));
+
+        TimedRaidAdventure raid = new TimedRaidAdventure(
+                List.of(raidRealm), raidEntities, raidWinConditions,
+                raidPlayers, raidGrid, 60, raidCharacters);
+
+        page.nextScreen();
+        raid.play();
     }
 }
