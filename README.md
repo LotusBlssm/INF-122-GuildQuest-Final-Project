@@ -3,6 +3,14 @@
 Contributors: Connor Darling, Gilberto Fernandez, Kenny Kim, Aung Myat, Vinny
 Nguyen
 
+## For the TAs Grading:
+
+You can run the jar file that is at the root of the directory
+OR you can run the jar file that is in the `target/` folder
+
+`java -jar target/guildquest-1.0-SNAPSHOT.jar`
+`java -jar guildquest-1.0-SNAPSHOT.jar`
+
 ## Installing Maven
 
 macOS (Homebrew):
