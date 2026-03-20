@@ -28,6 +28,7 @@ import edu.uci.inf122.guildquest.entities.nonlivings.Chest;
 import edu.uci.inf122.guildquest.ui.Page;
 import edu.uci.inf122.guildquest.ui.TerminalGrid;
 import edu.uci.inf122.guildquest.ui.playablecharacteruis.PlayableCharacterUI;
+import edu.uci.inf122.guildquest.ui.playablecharacteruis.PartyStatsUI;
 
 // The rule: 
 // starting point: (0, 0) with an NPC that needs to be escorted to the destination that the NPC knows. (The player does not know the destination)
@@ -139,6 +140,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      * Can perform actions specific to each player's class.
      */
     public void playerTurns() {
+        PartyStatsUI partyStats = new PartyStatsUI(player1, player2);
 
         boolean done = false;
         currentPlayer = player1;
@@ -152,6 +154,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 page.print(status.getMsg() + '\n');
                 continue;
             }
+
+            partyStats.display();
 
             gridState.render();
             if (currentPlayer == player1)
@@ -436,8 +440,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 """, 1);
         PlayableCharacterUI p1UI;
         PlayableCharacterUI p2UI;
-        Cleric c = Cleric.getInstance(new Name("Cleric"));
-        Assassin a = Assassin.getInstance(new Name("Assassin"));
+        Cleric c = Cleric.getInstance(new Name("Mary"));
+        Assassin a = Assassin.getInstance(new Name("Dante"));
         if (p1Choice == 1) {
             player1 = c;
             player2 = a;
@@ -451,8 +455,10 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             p2UI = c.getUI();
             page.print("Player 1 is the Assassin, player 2 is the Cleric\n");
         }
-        p1UI.display();
-        p2UI.display();
+
+        PartyStatsUI partyStats = new PartyStatsUI(player1, player2);
+        partyStats.display();
+
         currentPlayer = player1;
 
     }

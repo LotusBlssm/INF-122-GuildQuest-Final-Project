@@ -3,6 +3,7 @@ package edu.uci.inf122.guildquest.ui;
 import edu.uci.inf122.guildquest.content.Campaign;
 import edu.uci.inf122.guildquest.content.QuestEvent;
 import edu.uci.inf122.guildquest.content.VisibilityType;
+import edu.uci.inf122.guildquest.content.User;
 
 import java.util.List;
 
@@ -227,12 +228,31 @@ public class CampaignUI {
         page.print(display);
     }
 
-        public static void displayOptions(User user){
+    /**
+     * Open the UI to create a campaign for this user.
+     *
+     */
+    private static void createCampaign(User user){
+        Campaign campaign = CampaignUI.createCampaign();
+        campaign.setOwner(user);
+        user.addCampaign(campaign);
+        page.nextScreen();
+    }
+    /**
+     * open UI to edit this user's campaign
+     *
+     */
+    private static  void updateCampaign(User user) {
+        page.nextScreen();
+        CampaignUI.updateCampaign(user.getCampaigns());
+    }
+
+
+    public static void displayOptions(User user){
         String prompt = """
                 What would you like to do to the campaigns?
                 1 --- Create
                 2 --- Edit
-                3 --- View
                 
                 0 --- exit
                 """;
@@ -242,9 +262,8 @@ public class CampaignUI {
             page.nextScreen();
             switch (choice){
                 case 0 -> page.print("leaving\n");
-                case 1 -> createCharacter(user);
-                case 2 -> editCharacter(user);
-                case 3 -> removeCharacter(user);
+                case 1 -> createCampaign(user);
+                case 2 -> updateCampaign(user);
             }
         }
     }

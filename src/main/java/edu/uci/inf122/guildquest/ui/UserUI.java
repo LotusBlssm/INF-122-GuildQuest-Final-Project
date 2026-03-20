@@ -49,6 +49,16 @@ public class UserUI {
      * @return the user
      */
     public static User login(){
+        String guildQuestASCII = 
+            "  ____       _ _     _     ____                  _   \n" +
+            " / ___|_   _(_) | __| |   / __ \\ _   _  ___  ___| |_ \n" +
+            "| |  _| | | | | |/ _` |  / / _` | | | |/ _ \\/ __| __|\n" +
+            "| |_| | |_| | | | (_| | | (_| | |_| |  __/\\__ \\ |_ \n" +
+            " \\____|\\__,_|_|_|\\__,_|  \\__\\_|_|\\__,_|\\___||___/\\__|";
+
+        System.out.println("Welcome to");
+        System.out.println(guildQuestASCII + "\n \n");
+
         String prompt = """
                 1 --- Create User
                 2 --- Access User
@@ -68,6 +78,14 @@ public class UserUI {
      */
     private static void characterManager(User user) {
         CharacterUI.displayOptions(user);
+    }
+
+    /**
+     * Open the options to edit the characters of this user.
+     *
+     */
+    private static void campaignManager(User user) {
+        CampaignUI.displayOptions(user);
     }
     /**
      * open the UI to create a user.
@@ -120,33 +138,15 @@ public class UserUI {
     private static void openSettings() {
         page.print("unimplemented\n");
     }
+
     /**
-     * Open the UI to create a campaign for this user.
+     * Open the UI to play an adventure for this user.
      *
      */
-    private static  void createCampaign(User user){
-        Campaign campaign = CampaignUI.createCampaign();
-        campaign.setOwner(user);
-        user.addCampaign(campaign);
-        page.nextScreen();
+    private static void playAdventure(User user){
+        AdventureUI.displayOptions(user);
     }
-    /**
-     * open UI to edit this user's campaign
-     *
-     */
-    private static  void updateCampaign(User user) {
-        page.nextScreen();
-        CampaignUI.updateCampaign(user.getCampaigns());
-    }
-    /**
-     * open UI to delete a campaign from thi suser
-     *
-     */
-    private static  void removeCampaign(User user) {
-        Campaign c = CampaignUI.chooseCampaign(user.getCampaigns(), false);
-        if (c == null) return;
-        user.removeCampaign(c);
-    }
+
 
     /**
      * Display options.
@@ -170,28 +170,9 @@ public class UserUI {
                 case AdventureMan -> playAdventure(user);
                 case CampaignMan -> campaignManager(user);
                 case CharMan -> characterManager(user);
-                case Settings -> openSettings();
                 case Exit -> System.out.print("");
                 default -> throw new Error("Invalid Choice, should not be possible");
             }
         }
-    }
-    /**
-     * View the campaigns this user has, then choose to do something to those ecampaigns.
-     *
-     */
-    private static void viewCampaign(User user){
-        Campaign c = CampaignUI.chooseCampaign(user.getCampaigns());
-        if (c == null) return;
-        CampaignUI.viewCampaign(c);
-    }
-    /**
-     * open UI to edit a campaign.
-     *
-     */
-    private static void editCampaign(User user){
-        int choice = page.acceptIntUntil("1 --- Update Campaign\n2 --- Remove Campaign\n0 --- go back\n", 2);
-        if (choice == 1) updateCampaign(user);
-        else if (choice == 2) removeCampaign(user);
     }
 }
