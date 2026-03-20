@@ -81,21 +81,17 @@ public class TimedRaidAdventure extends MiniAdventure {
                     break;
                 }
                 validCommand = processCommand(pendingCommand);
-                if (!validCommand) {
-                    System.out.print("> ");
-                    pendingCommand = scanner.nextLine().trim().toLowerCase();
-                }
             }
             if (!gameOver) {
                 removeDeadEntities();
                 turnTimer.endTurn();
                 if (!checkGameOver()) {
                     turnNumber++;
-                    // After all players have gone, hostiles take a turn
                     if (currentPlayerIndex == players.size() - 1) {
                         hostileTurn();
                         removeDeadEntities();
-                        if (checkGameOver()) continue;
+                        if (checkGameOver())
+                            continue;
                     }
                     swapTurn();
                 }
@@ -330,7 +326,6 @@ public class TimedRaidAdventure extends MiniAdventure {
                     + " (" + pc.getName() + ") HP:" + pc.getHealth()
                     + " | Time: " + turnTimer.getSecondsRemaining(i) + "s" + marker);
         }
-        // Show living enemies
         boolean hasEnemies = false;
         for (Entity e : entities) {
             if (e instanceof NPC npc && e instanceof Hostile && !npc.isDead()) {
@@ -374,21 +369,26 @@ public class TimedRaidAdventure extends MiniAdventure {
     private void hostileTurn() {
         System.out.println();
         System.out.println("--- Enemy turn ---");
+        java.util.Set<Entity> acted = new java.util.HashSet<>();
         for (int r = 0; r < grid.getLength(); r++) {
             for (int c = 0; c < grid.getWidth(); c++) {
                 GridCell cell = grid.getCell(r, c);
-                if (cell.isEmpty()) continue;
+                if (cell.isEmpty())
+                    continue;
                 Entity e = cell.getContent().get(0);
-                if (!(e instanceof Hostile hostile) || !(e instanceof NPC npc)) continue;
-                if (npc.isDead()) continue;
+                if (!(e instanceof Hostile hostile) || !(e instanceof NPC npc))
+                    continue;
+                if (npc.isDead() || acted.contains(e))
+                    continue;
+                acted.add(e);
 
-                // Check if any player is adjacent — if so, attack
                 boolean attacked = false;
-                int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+                int[][] dirs = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
                 for (int[] d : dirs) {
                     int adjR = r + d[0];
                     int adjC = c + d[1];
-                    if (!grid.isValidPosition(adjR, adjC)) continue;
+                    if (!grid.isValidPosition(adjR, adjC))
+                        continue;
                     GridCell adjCell = grid.getCell(adjR, adjC);
                     if (!adjCell.isEmpty() && adjCell.getContent().get(0) instanceof PlayableCharacter) {
                         hostile.attack(adjCell.getContent().get(0));
@@ -397,7 +397,6 @@ public class TimedRaidAdventure extends MiniAdventure {
                     }
                 }
 
-                // If no adjacent player, move toward nearest player
                 if (!attacked) {
                     int bestDist = Integer.MAX_VALUE;
                     int bestPIdx = 0;
@@ -414,7 +413,6 @@ public class TimedRaidAdventure extends MiniAdventure {
                     int moveR = r;
                     int moveC = c;
 
-                    // Move one step toward nearest player
                     if (Math.abs(targetR - r) >= Math.abs(targetC - c)) {
                         moveR += (targetR > r) ? 1 : -1;
                     } else {
