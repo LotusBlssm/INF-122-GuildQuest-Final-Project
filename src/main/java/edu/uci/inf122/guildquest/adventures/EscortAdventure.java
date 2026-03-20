@@ -1,6 +1,7 @@
 package edu.uci.inf122.guildquest.adventures;
 
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
+import edu.uci.inf122.guildquest.api.Status;
 import edu.uci.inf122.guildquest.api.state.GridCell;
 import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
 import edu.uci.inf122.guildquest.content.*;
@@ -118,68 +119,40 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         gridState.render();
         while (true) {
 
-            // accept player input
-            playerTurns(); // will render
-            allEnemyTurns();
-            // advance the game state
-            advanceCycle();
-            // in the case the game should end after accepting input
-            if (checkRunningCondition()) {
+            Status res = advanceCycle();
+            if (res.isDone()){
+                page.print(res.getMsg());
                 break;
             }
-
-            // check win conditions and update gameRunning accordingly
-
         }
+    }
+
+    @Override
+    public Status advanceCycle() {
+        playerTurns(); // will render
+        allEnemyTurns();
+        return checkRunningCondition();
     }
 
     /**
      * Accepts input and acts for player 1 and player 2
-     * Can attack, move, or ask NPC for hints
+     * Can perform actions specific to each player's class.
      */
     public void playerTurns() {
 
-        // before the player choose the move (move or attack), the NPC with them can
-        // give them the fact if there ar enemies around them (2 spaces away in any
-        // direction).
-
-        // unsure what we mean by "the NPC with them"
-
-        // String npcHint = nearbyNPC.speak();
-        // String prompt = gridState.getGridStr()+npcHint+CHOICES_PROMPT
         boolean done = false;
         currentPlayer = player1;
         while (!done) {
-            List<Move.ValidMoves> moves = currentPlayer.getMoves();
-            String moveString = TerminalGrid.toOptions(moves);
-            String moveRegex = TerminalGrid.toOptionsRegex(moves);
-            String input = page.acceptStrUntil(currentPlayer.getName() + "'s turn!\n" + moveString, moveRegex);
-            if (input.contains("move")) {
-                if (!attemptMovePlayer(currentPlayer, input.charAt(input.length() - 1)))
-                    continue;
+            Status temp = acceptInput();
+            String input = temp.getMsg();
+
+            Status status = inputToAction(input);
+
+            if (status.isFail()){
+                page.print(status.getMsg() + '\n');
+                continue;
             }
-            else if (input.contains("use item")){
-                if (! attemptUseItem(currentPlayer) )
-                    continue;
-            }
-            else if (input.contains("attack")) {
-                if (!attemptPlayerAttack(currentPlayer, input.charAt(input.length() - 1)))
-                    continue;
-            }
-            else if (input.contains("heal self")) {
-                if (!attemptPlayerHealSelf(currentPlayer))
-                    continue;
-            }
-            else if (input.contains("heal")) {
-                if (!attemptPlayerHealOther(currentPlayer, input.charAt(input.length() - 1)))
-                    continue;
-            }
-            else if (input.equals("r")) {
-                if (!makeHintRequest())
-                    continue; // check to see if npc is nearby
-            }
-            else
-                throw new IllegalStateException("Something went wrong with input, cannot parse");
+
             gridState.render();
             if (currentPlayer == player1)
                 currentPlayer = player2;
@@ -199,116 +172,116 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         // destination location is known.
         // if the player with the NPC is on the same grid cell as the destination, then
         // end the game with a win.
-
-        // Enemies:
-        // - attack player if adjacent to player with NPC
-        // - if the player attacked them, the enemy can attack the player back during
-        // their turn
     }
 
-    private boolean attemptUseItem(PlayableCharacter currentPlayer) {
+    private Status inputToAction(String input) {
+        if (input.contains("move")) {
+            return attemptMovePlayer(currentPlayer, input.charAt(input.length() - 1));
+        }
+        else if (input.contains("use item")){
+            return attemptUseItem(currentPlayer);
+        }
+        else if (input.contains("attack")) {
+            return attemptPlayerAttack(currentPlayer, input.charAt(input.length() - 1));
+        }
+        else if (input.contains("heal self")) {
+            return attemptPlayerHealSelf(currentPlayer);
+        }
+        else if (input.contains("heal")) {
+            return attemptPlayerHealOther(currentPlayer, input.charAt(input.length() - 1));
+        }
+        else if (input.equals("r")) {
+            return makeHintRequest(); // check to see if npc is nearby
+        }
+        else
+            throw new IllegalStateException("Something went wrong with input, cannot parse");
+    }
+
+    private Status attemptUseItem(PlayableCharacter currentPlayer) {
         if (currentPlayer.getInventory().isEmpty()){
-            page.print("Inventory is empty, do something else.\n");
-            return false;
+            return new Status(Status.Option.FAIL, "Inventory is empty, do something else.");
         }
         Item item = currentPlayer.getUI().promptInventory();
         if (item==null)
-            return false;
+            return new Status(Status.Option.FAIL, "We could not get this item.");
         if (item instanceof SelfApplicable i){
             int prev = currentPlayer.getHealth().getHealth();
             boolean success = i.use(currentPlayer);
             if (!success){
-                page.print("something went wrong, not healed");
-                return false;
+                return new Status(Status.Option.FAIL, "something went wrong, not healed.");
             }
             int cur = currentPlayer.getHealth().getHealth();
-            page.print("heal increased from "+prev+" to "+cur+'\n');
-            return success;
+            return new Status(Status.Option.SUCCESS, "heal increased from "+prev+" to "+cur);
         } else{
-            page.print("have not implemented items that can be applied to others");
-            return false;
+            return new Status(Status.Option.FAIL, "have not implemented items that can be applied to others.");
         }
     }
 
-    private boolean attemptPlayerHealSelf(PlayableCharacter p) {
+    private Status attemptPlayerHealSelf(PlayableCharacter p) {
         if (p instanceof CanHealSelf healer) {
             if (p.isDead()) {
-                page.print("You cannot heal yourself. You're dead!\n");
-                return false;
+                return new Status(Status.Option.FAIL, "You cannot heal yourself. You're dead");
             }
             if (p.getHealth().isFull()) {
-                page.print("You're already at full health! Nothing to heal :)\n");
-                return false;
+                return new Status(Status.Option.FAIL, "You're already at full health! Nothing to heal :)");
             }
             if (p instanceof Cleric c) {
                 c.heal(c.getHealingPower());
-                page.print(c.getName() + " healed to " + c.getHealth() + '\n');
-                return true;
+                return new Status(Status.Option.SUCCESS, c.getName() + " healed to " + c.getHealth());
             }
             throw new IllegalStateException("Error in PlayerHeal, something went wrong");
         } else {
             page.print("This character cannot heal\n");
-            return false;
+            return new Status(Status.Option.FAIL, "This character cannot heal");
         }
     }
 
-    private boolean attemptPlayerHealOther(PlayableCharacter p, char direction) {
-        if (p instanceof CanHealOther healer) {
-            if (p.isDead()) {
-                page.print("You cannot heal others. You're dead!\n");
-                return false;
-            }
-            if (gridState.isValidAdjacent(p, direction)) {
-                GridCell targetCell = gridState.getCellAdjacent(p, direction);
-                if (!targetCell.isEmpty()) {
-                    Entity target = targetCell.getContent().get(0);
-                    if (target instanceof PlayableCharacter otherPlayer) {
-                        if (otherPlayer.getHealth().isFull()) {
-                            page.print("Already at full health. Do something else.\n");
-                            return false;
-                        } else {
-                            healer.heal(healer.getHealAmount(), otherPlayer);
-                            return true;
-                        }
-                    } else {
-                        page.print("can only heal other players for now.\n");
-                        return false;
-                    }
-                } else {
-                    page.print("Target cell is empty, cannot heal here\n");
-                    return false;
-                }
-            } else {
-                page.print("You cannot heal in that direction\n");
-                return false;
-            }
-        } else {
-            page.print("This character cannot others!\n");
-            return false;
+    private Status attemptPlayerHealOther(PlayableCharacter p, char direction) {
+        if (!(p instanceof CanHealOther healer)) {
+            return new Status(Status.Option.FAIL, "This character cannot others!");
         }
+        else if (p.isDead()) {
+            return new Status(Status.Option.FAIL, "You cannot heal yourself. You're dead");
+        }
+        else if (!gridState.isValidAdjacent(p, direction)) {
+            return new Status(Status.Option.FAIL, "You cannot heal in that direction");
+        }
+
+        GridCell targetCell = gridState.getCellAdjacent(p, direction);
+
+        if (targetCell.isEmpty()) {
+            return new Status(Status.Option.FAIL, "Target cell is empty, cannot heal here");
+        }
+
+        Entity target = targetCell.getContent().get(0);
+
+        if (!(target instanceof PlayableCharacter otherPlayer)) {
+            return new Status(Status.Option.FAIL, "can only heal other players for now.");
+        }
+        else if (otherPlayer.getHealth().isFull()) {
+            return new Status(Status.Option.FAIL, "Already at full health. Do something else");
+        }
+
+        healer.heal(healer.getHealAmount(), otherPlayer);
+        return new Status(Status.Option.SUCCESS);
     }
 
-    public void acceptInput() {
-
-
+    @Override
+    public Status acceptInput() {
+        List<Move.ValidMoves> moves = currentPlayer.getMoves();
+        String moveString = TerminalGrid.toOptions(moves);
+        String moveRegex = TerminalGrid.toOptionsRegex(moves);
+        String input = page.acceptStrUntil(currentPlayer.getName() + "'s turn!\n" + moveString, moveRegex);
+        return new Status(Status.Option.SUCCESS, input);
     }
 
-    private boolean attemptPlayerAttack(PlayableCharacter p, char direction) {
+    private Status attemptPlayerAttack(PlayableCharacter p, char direction) {
         GridCell attackTarget = gridState.getCellAdjacent(currentPlayer, direction);
         if (attackTarget.isEmpty() ||
                 !(attackTarget.getContent().get(0) instanceof Hostile)) {
-            page.print("Cannot attack that cell\n\n");
-            return false;
+            return new Status(Status.Option.FAIL, "Cannot attack that cell");
         }
-        int[] target = gridState.getLocationCords(gridState.getLocation(p));
-        switch (direction) {
-            case 'e' -> target[1] += 1;
-            case 'w' -> target[1] -= 1;
-            case 's' -> target[0] += 1;
-            case 'n' -> target[0] -= 1;
-            default -> throw new IllegalStateException("Unexpected direction: " + direction);
-        }
-        GridCell targetCell = gridState.getCell(target[0], target[1]);
+        GridCell targetCell = cellAdjacent(p, direction);
 
         p.attack(targetCell.getContent().get(0)); // assume only on 1st layer
         if (targetCell.getContent().get(0) instanceof Goblin g) {
@@ -318,9 +291,12 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 gridState.render();
             }
         }
-        return true;
+        return new Status(Status.Option.SUCCESS);
     }
 
+    /**
+     * All enemies act here
+     */
     public void allEnemyTurns() {
         for (Entity h : enemies) {
             enemyTurn(h);
@@ -357,14 +333,44 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
 
     }
 
-    public void advanceCycle() {
-    }
 
     public AdventureSnapshot saveSnapshot() {
         // logic to save the current state of the adventure
         return null; // placeholder
     }
 
+    /**
+     * Update the target arr to be 1 adjacent in the direction specified.
+     *
+     * @param target    the target
+     * @param direction the direction
+     */
+    public static void moveCordInDirection(int[] target, char direction){
+        switch (direction) {
+            case 'e' -> target[1] += 1;
+            case 'w' -> target[1] -= 1;
+            case 's' -> target[0] += 1;
+            case 'n' -> target[0] -= 1;
+            default -> throw new IllegalStateException("Unexpected direction: " + direction);
+        }
+    }
+
+    /**
+     * Get the coordinates for the GridCell in the cardinal direction (nswe) adjacent.
+     *
+     * @param entity         the
+     * @param direction the cardinal direction
+     * @return the adjacent grid cell
+     */
+    public GridCell cellAdjacent(Entity entity, char direction){
+        int[] target = gridState.getLocationCords(gridState.getLocation(entity));
+        moveCordInDirection(target, direction);
+        return gridState.getCell(target[0], target[1]);
+    }
+
+    /**
+     * Initialize grid with the information given
+     */
     public void initializeGrid() {
         // logic to initialize the grid with entities, place the NPC to be escorted,
         // items, tresures, and enemies
@@ -410,6 +416,9 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         gridState.initializeGrid(npcs);
     }
 
+    /**
+     * Initialize player character.
+     */
     void initializePlayerCharacter() {
         // logic to let the player choose their character and tools, etc.
     }
@@ -453,22 +462,16 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      *
      * @param p         the p
      * @param direction the direction
+     * @return the status
      */
-    public boolean attemptMovePlayer(PlayableCharacter p, char direction) {
+    public Status attemptMovePlayer(PlayableCharacter p, char direction) {
         if (!gridState.canMove(currentPlayer, direction)) {
-            page.print("Cannot move in that direction\n");
-            return false;
+            return new Status(Status.Option.FAIL, "Cannot move in that direction");
         }
-        int[] target = gridState.getLocationCords(gridState.getLocation(p));
+
+        GridCell targetCell = cellAdjacent(p, direction);
+
         gridState.removeEntity(p);
-        switch (direction) {
-            case 'e' -> target[1] += 1;
-            case 'w' -> target[1] -= 1;
-            case 's' -> target[0] += 1;
-            case 'n' -> target[0] -= 1;
-            default -> throw new IllegalStateException("Unexpected direction: " + direction);
-        }
-        GridCell targetCell = gridState.getCell(target[0], target[1]);
         if (targetCell.hasContent()) {
             if (targetCell.getTop() instanceof Chest chest){
                 Item item = chest.take();
@@ -486,75 +489,12 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         return gridState.setCellWithChecking(targetCell, p);
     }
 
-    public void makeAttack(int currentPlayer) {
-        // logic to let the player make attack choices
-
-        // step1: pick the direction to attack (since they don't know the enemy's
-        // location)
-        // player can choose: up, down, left, right
-        String direction = "up"; // placeholder for player input
-        int x = 0; // placeholder for player input
-        int y = 0;
-        switch (direction) {
-            case "up" -> {
-                // logic to attack up
-                y += 2;
-                break;
-            }
-            case "down" -> {
-                // logic to attack down
-                y -= 2;
-                break;
-            }
-            case "left" -> {
-                // logic to attack left
-                x -= 2;
-                break;
-            }
-            case "right" -> {
-                // logic to attack right
-                x += 2;
-                break;
-            }
-            default -> {
-                // prompt player for valid input
-            }
-        }
-        // step2: collect all the enemies in the chosen direction within 2 spaces
-        int[] playerPosition = gridState.getLocationCords(currentPlayer == 0 ? player1 : player2);
-        List<Entity> enemiesToAttack = new ArrayList<>();
-        for (int i = 1; i <= 2; i++) {
-            int newRow = playerPosition[0] + (y == 0 ? 0 : i * (y / Math.abs(y)));
-            int newCol = playerPosition[1] + (x == 0 ? 0 : i * (x / Math.abs(x)));
-            if (gridState.isValidPosition(newRow, newCol)) {
-                for (Entity content : gridState.getCellContent(newRow, newCol).getContent()) {
-                    if (content instanceof Goblin) { // check if the entity is an enemy
-                        enemiesToAttack.add(content);
-                    }
-                }
-            }
-        }
-        // step3: apply the attack to all the enemies in that direction within 2 spaces
-        for (Entity enemy : enemiesToAttack) {
-            if (enemy instanceof Goblin goblinEnemy) {
-                if (currentPlayer == 0) {
-                    player1.attack(goblinEnemy);
-                } else {
-                    player2.attack(goblinEnemy);
-                }
-                // if the enemy is defeated, remove it from the grid and let the player know
-                if (goblinEnemy.getHealth().getHealth() <= 0) { // chain..!
-                    int[] enemyPosition = gridState.getLocationCords(goblinEnemy);
-                    gridState.removeEntity(enemyPosition[0], enemyPosition[1], goblinEnemy);
-                    page.print("You defeated an enemy!\n");
-                }
-            }
-        }
-        // edge cases:
-        // if the player is at the edge of the grid
-    }
-
-    public boolean makeHintRequest() {
+    /**
+     * Character requests a hint.
+     *
+     * @return the status. Always true currently.
+     */
+    public Status makeHintRequest() {
         // logic to let the player ask for hints
 
         // check the distance between the player with the NPC and the destination
@@ -565,20 +505,29 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         } else {
             // give vague hints about the destination (ex: direction)
             // tell "Far....."
-            page.print("destination is far...\n");
+//            page.print("destination is far...\n");
         }
-        return true;
+        return new Status(Status.Option.SUCCESS, "Destination is far...");
     }
 
-    public boolean checkRunningCondition() {
-        // learn to use actual WinConditoin object here.
+    /**
+     * Checks the win conditions to see if the game should end
+     *
+     * @return return status. Either done or continue
+     */
+    public Status checkRunningCondition() {
+        // learn to use actual WinCondition object here.
         if (player1.isDead() || player2.isDead()) {
-            page.print("You died! You lost.");
-            return true;
+            return new Status(Status.Option.DONE, "You died! You lost.");
         } else
-            return false;
+            return new Status(Status.Option.CONTINUE);
     }
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         List<WinCondition> winConditions = List.of(new TimeLimitCondition(new Time(2)));
 
