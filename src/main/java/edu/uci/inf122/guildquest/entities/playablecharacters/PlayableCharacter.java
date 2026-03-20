@@ -17,7 +17,7 @@ public abstract class PlayableCharacter extends Entity implements HasHealth {
     private final Inventory inventory;
     private static final List<Move.ValidMoves> moves = List.of();
 
-    private final WithPrincess withPrincess;
+    private WithPrincess withPrincess;
 
     public PlayableCharacter(Name name, Health health, Level level, CharacterClass characterClass) {
         super(name);
@@ -93,6 +93,10 @@ public abstract class PlayableCharacter extends Entity implements HasHealth {
 
     public WithPrincess getWithPrincess() {
         return withPrincess;
+    }
+
+    public void pickUpPrincess(){
+        withPrincess = withPrincess.startEscorting();
     }
 
     public abstract List<Move.ValidMoves> getMoves();

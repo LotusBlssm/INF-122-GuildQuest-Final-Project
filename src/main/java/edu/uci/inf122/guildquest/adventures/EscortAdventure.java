@@ -491,6 +491,10 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 page.print("added "+item.getName()+" to inventory\n");
                 gridState.removeEntity(item);
             }
+            else if (targetCell.getTop() instanceof Princess) {
+                currentPlayer.pickUpPrincess();
+                page.print("You are now escorting the princess\n");
+            }
         }
         return gridState.setCellWithChecking(targetCell, p);
     }
