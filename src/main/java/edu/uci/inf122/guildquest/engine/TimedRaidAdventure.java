@@ -1,6 +1,7 @@
 package edu.uci.inf122.guildquest.engine;
 
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
+import edu.uci.inf122.guildquest.api.Status;
 import edu.uci.inf122.guildquest.api.TurnTimer;
 import edu.uci.inf122.guildquest.api.state.GridCell;
 import edu.uci.inf122.guildquest.api.state.GridState;
@@ -102,7 +103,7 @@ public class TimedRaidAdventure extends MiniAdventure {
     }
 
     @Override
-    public void acceptInput() {
+    public Status acceptInput() {
         User player = getCurrentPlayer();
         System.out.println();
         System.out.println(player.getUsername() + "'s turn (Time: "
@@ -111,6 +112,7 @@ public class TimedRaidAdventure extends MiniAdventure {
         System.out.print("> ");
 
         pendingCommand = scanner.nextLine().trim().toLowerCase();
+        return new Status(Status.Option.CONTINUE);
     }
 
     @Override
@@ -307,12 +309,16 @@ public class TimedRaidAdventure extends MiniAdventure {
     }
 
     private void placePlayersOnGrid() {
+        int rows = grid.getLength();
+        int cols = grid.getWidth();
+        int[][] corners = {{0, 0}, {rows - 1, 0}, {0, cols - 1}, {rows - 1, cols - 1}};
         for (int i = 0; i < playerCharacters.size(); i++) {
             PlayableCharacter pc = playerCharacters.get(i);
-            int row = i * (grid.getLength() - 1);
+            int row = corners[i][0];
+            int col = corners[i][1];
             playerPositions[i][0] = row;
-            playerPositions[i][1] = 0;
-            grid.setCell(row, 0, pc);
+            playerPositions[i][1] = col;
+            grid.setCell(row, col, pc);
         }
     }
 
