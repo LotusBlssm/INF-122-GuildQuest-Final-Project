@@ -3,6 +3,8 @@ package edu.uci.inf122.guildquest.adventures;
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
 import edu.uci.inf122.guildquest.api.Status;
 import edu.uci.inf122.guildquest.api.state.GridCell;
+import edu.uci.inf122.guildquest.api.win_conditions.MultipleStaysAliveCondition;
+import edu.uci.inf122.guildquest.api.win_conditions.StaysAliveCondition;
 import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
 import edu.uci.inf122.guildquest.content.*;
 
@@ -104,8 +106,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         super(realms, entities, winCondition, players);
         gridState = new TerminalGrid(6, 6);
         // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
-        // player1 = Assassin.getInstance(new Name("assassin")); // placeholder
-        // player2 = Cleric.getInstance(new Name(players.get(1).getName())); //
+         player1 = Assassin.getInstance(new Name("assassin")); // placeholder
+         player2 = Cleric.getInstance(new Name("cleric")); //
         // placeholder
     }
 
@@ -121,8 +123,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         while (true) {
 
             Status res = advanceCycle();
+            page.print(res.getMsg());
             if (res.isDone()){
-                page.print(res.getMsg());
                 break;
             }
         }
@@ -384,35 +386,36 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
 
         // they are all placed randomly, but the distance between the starting point and
         // enemies should be at least 6 spaces away
-        Princess princess_npc = new Princess(
-                new Name("princess"), new Health(10), new Amount(2));
 
-        Goblin enemy1 = new Goblin(new Name("Goblin 1"), new Health(10), new Level(1));
-        Goblin enemy2 = new Goblin(new Name("Goblin 2"), new Health(12), new Level(1));
-        Goblin enemy3 = new Goblin(new Name("Goblin 3"), new Health(15), new Level(2));
-        enemies = new ArrayList<>(List.of(enemy1, enemy2, enemy3));
+        int i = 0;
+        enemies = new ArrayList<>();
+        items = new ArrayList<>();
+        npcs = new ArrayList<>();
+        chests = new ArrayList<>();
+        for (Entity e : entities){
+            if (e instanceof Princess){
+                gridState.setCell(0, i++, e);
+            }
+            else if (e instanceof PlayableCharacter){
+                gridState.setCell(0, i++, e);
+            }
+            else if (e instanceof Goblin){
+                enemies.add(e);
+            }
+            else if (e instanceof Item) {
+                items.add(e);
+            }
+            else if (e instanceof Chest) {
+                chests.add(e);
+            }
+            else if (e instanceof NPC){
+                npcs.add(e);
+            }
+        }
 
-        Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
-        Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
-        Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
-        items = new ArrayList<>(List.of(item2, item3));
-
-        Chest chest1 = new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword"));
-        Chest chest2 = new Chest(new Name("chest2"), item2, new Text("a chest with a red stick"));
-        Chest chest3 = new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe"));
-        chests = new ArrayList<>(List.of(chest1, chest2, chest3));
-
-        NPC npc1 = new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10));
-        NPC npc2 = new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100));
-
-        npcs = new ArrayList<>(List.of(npc1, npc2));
-
-        // randomly place the entities on the grid
-        // princess, player1, and player2 are placed at the same starting point.
-        gridState.setCell(0, 0, princess_npc);
+//        gridState.setCell(0, 0, princess_npc);
         gridState.setCell(0, 1, player1);
         gridState.setCell(0, 2, player2);
-        gridState.setCell(2, 1, item1);
 
         gridState.initializeGrid(enemies);
         gridState.initializeGrid(items);
@@ -445,14 +448,10 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         if (p1Choice == 1) {
             player1 = c;
             player2 = a;
-            p1UI = c.getUI();
-            p2UI = a.getUI();
             page.print("Player 1 is the Cleric, player 2 is the Assassin\n");
         } else {
             player1 = a;
             player2 = c;
-            p1UI = a.getUI();
-            p2UI = c.getUI();
             page.print("Player 1 is the Assassin, player 2 is the Cleric\n");
         }
 
@@ -527,6 +526,11 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      */
     public Status checkRunningCondition() {
         // learn to use actual WinCondition object here.
+        for (WinCondition wc : getWinConditions()){
+            if (wc.isLost()){
+                return new Status(Status.Option.DONE, wc.loseMessage().toString());
+            }
+        }
         if (player1.isDead() || player2.isDead()) {
             return new Status(Status.Option.DONE, "You died! You lost.");
         } else
@@ -539,11 +543,31 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      * @param args the input arguments
      */
     public static void main(String[] args) {
-        List<WinCondition> winConditions = List.of(new TimeLimitCondition(new Time(2)));
+        Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
+        Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
+        Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
+        Princess princess = new Princess(new Name("princess"), new Health(10), new Amount(2));
+
+        List<WinCondition> winConditions = List.of(
+                new StaysAliveCondition(princess)
+        );
+
+        List<Entity> entities = List.of(
+            princess,
+            new Goblin(new Name("Goblin 1"), new Health(10), new Level(1)),
+            new Goblin(new Name("Goblin 2"), new Health(12), new Level(1)),
+            new Goblin(new Name("Goblin 3"), new Health(15), new Level(2)),
+            item1, item2, item3,
+            new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword")),
+            new Chest(new Name("chest2"), item2, new Text("a chest with a red stick")),
+            new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe")),
+            new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10)),
+            new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100))
+        );
 
         EscortAdventure adventure = new EscortAdventure(
                 null,
-                null,
+                entities,
                 winConditions,
                 null);
 

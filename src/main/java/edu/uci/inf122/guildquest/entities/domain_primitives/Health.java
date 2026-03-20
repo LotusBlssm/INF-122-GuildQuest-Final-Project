@@ -79,4 +79,8 @@ public class Health {
     public boolean isFull() {
         return health==capacity;
     }
+
+    public boolean isDead() {
+        return health==0;
+    }
 }

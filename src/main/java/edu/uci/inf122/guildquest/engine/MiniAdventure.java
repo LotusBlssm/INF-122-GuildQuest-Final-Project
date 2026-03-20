@@ -12,7 +12,7 @@ import java.util.List;
 
 public abstract class MiniAdventure {
     private List<Realm> realms;
-    private List<Entity> entities; // placeholder for now - will be replaced with actual Entity objects
+    protected List<Entity> entities; // placeholder for now - will be replaced with actual Entity objects
     private List<WinCondition> winCondition;
     private List<User> players;
     private State state;
@@ -37,5 +37,9 @@ public abstract class MiniAdventure {
 
     public User getPlayer(int index) {
         return players.get(index);
+    }
+
+    public List<WinCondition> getWinConditions() {
+        return winCondition;
     }
 }
