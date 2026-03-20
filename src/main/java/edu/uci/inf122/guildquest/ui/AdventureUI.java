@@ -91,8 +91,10 @@ public class AdventureUI {
                 if (classChoice >= 1 && classChoice <= 3
                         && !classTaken.get(classChoice - 1)) {
                     valid = true;
-                } else {
+                } else if (classChoice >= 1 && classChoice <= 3) {
                     System.out.println("That class is already taken.");
+                } else {
+                    System.out.println("Invalid choice. Please select an available class.");
                 }
             }
             classTaken.set(classChoice - 1, true);
