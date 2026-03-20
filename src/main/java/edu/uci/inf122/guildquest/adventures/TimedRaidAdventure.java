@@ -363,10 +363,10 @@ public class TimedRaidAdventure extends MiniAdventure {
         }
 
         for (WinCondition wc : winConditions) {
-            if (wc.isWon(this)) {
+            if (wc.isWon()) {
                 System.out.println("Victory! The raid was successful!");
             }
-            if (wc.isLost(this)) {
+            if (wc.isLost()) {
                 System.out.println("Defeat! The raid failed.");
             }
         }
@@ -466,7 +466,7 @@ public class TimedRaidAdventure extends MiniAdventure {
             }
         }
         for (WinCondition wc : winConditions) {
-            if (wc.isWon(this) || wc.isLost(this)) {
+            if (wc.isWon() || wc.isLost()) {
                 gameOver = true;
                 return true;
             }

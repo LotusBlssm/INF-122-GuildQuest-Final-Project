@@ -3,13 +3,12 @@ package edu.uci.inf122.guildquest.adventures;
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
 import edu.uci.inf122.guildquest.api.Status;
 import edu.uci.inf122.guildquest.api.state.GridCell;
-import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
+import edu.uci.inf122.guildquest.api.win_conditions.*;
 import edu.uci.inf122.guildquest.content.*;
 
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
-import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 // import edu.uci.inf122.guildquest.ui;
 import edu.uci.inf122.guildquest.content.items.Item;
 import edu.uci.inf122.guildquest.content.items.ItemFactory;
@@ -80,6 +79,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     // private GridUI gridUI;
     // save/serialize
     private final TerminalGrid gridState;
+    private final GetToTargetXYWithPrincessCondition condition;
     private PlayableCharacter player1;
     private PlayableCharacter player2;
     private List<Entity> enemies;
@@ -89,6 +89,26 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     private final static Page page = Page.getPage();
     private PlayableCharacter currentPlayer;
     private List<User> players;
+
+    public static List<Entity> defaultEntities() {
+        Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
+        Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
+        Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
+        Princess princess = new Princess(new Name("princess"), new Health(10), new Amount(2));
+
+        return List.of(
+                princess,
+                new Goblin(new Name("Goblin 1"), new Health(10), new Level(1)),
+                new Goblin(new Name("Goblin 2"), new Health(12), new Level(1)),
+                new Goblin(new Name("Goblin 3"), new Health(15), new Level(2)),
+                item1, item2, item3,
+                new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword")),
+                new Chest(new Name("chest2"), item2, new Text("a chest with a red stick")),
+                new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe")),
+                new Ferryman(new Name("John Ferryman"), new XYPlace(new Name("Destination"),4,4), new Amount(10)),
+                new Ferryman(new Name("Expensive Ferryman"), new XYPlace(new Name("Destination"),4,4), new Amount(100))
+        );
+    }
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
@@ -105,6 +125,11 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         super(realms, entities, winCondition, players);
         this.players = players;
         gridState = new TerminalGrid(6, 6);
+        if (winCondition.get(0) instanceof GetToTargetXYWithPrincessCondition xyp){
+            condition=xyp;
+        }
+        else
+            condition=null; // temp
         // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
         // player1 = Assassin.getInstance(new Name("assassin")); // placeholder
         // player2 = Cleric.getInstance(new Name(players.get(1).getName())); //
@@ -123,8 +148,8 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
         while (true) {
 
             Status res = advanceCycle();
+            page.print(res.getMsg());
             if (res.isDone()){
-                page.print(res.getMsg());
                 break;
             }
         }
@@ -386,39 +411,40 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
 
         // they are all placed randomly, but the distance between the starting point and
         // enemies should be at least 6 spaces away
-        Princess princess_npc = new Princess(
-                new Name("princess"), new Health(10), new Amount(2));
 
-        Goblin enemy1 = new Goblin(new Name("Goblin 1"), new Health(10), new Level(1));
-        Goblin enemy2 = new Goblin(new Name("Goblin 2"), new Health(12), new Level(1));
-        Goblin enemy3 = new Goblin(new Name("Goblin 3"), new Health(15), new Level(2));
-        enemies = new ArrayList<>(List.of(enemy1, enemy2, enemy3));
+        int i = 0;
+        enemies = new ArrayList<>();
+        items = new ArrayList<>();
+        npcs = new ArrayList<>();
+        chests = new ArrayList<>();
+        for (Entity e : entities){
+            if (e instanceof Princess){
+                gridState.setCell(0, i++, e);
+            }
+            else if (e instanceof PlayableCharacter){
+                gridState.setCell(0, i++, e);
+            }
+            else if (e instanceof Goblin){
+                enemies.add(e);
+            }
+            else if (e instanceof Item) {
+                items.add(e);
+            }
+            else if (e instanceof Chest) {
+                chests.add(e);
+            }
+            else if (e instanceof NPC){
+                npcs.add(e);
+            }
+        }
 
-        Item item1 = ItemFactory.createHealingPotion("hp potion", 1, "a blue sword", null, 10);
-        Item item2 = ItemFactory.createWeapon("red stick", 1, "a flimsy red stick", 1);
-        Item item3 = ItemFactory.createTool("green pickaxe", 1, "a green pickaxe");
-        items = new ArrayList<>(List.of(item2, item3));
-
-        Chest chest1 = new Chest(new Name("chest1"), item1, new Text("a chest with a blue sword"));
-        Chest chest2 = new Chest(new Name("chest2"), item2, new Text("a chest with a red stick"));
-        Chest chest3 = new Chest(new Name("chest3"), item3, new Text("a chest with a green pickaxe"));
-        chests = new ArrayList<>(List.of(chest1, chest2, chest3));
-
-        NPC npc1 = new Ferryman(new Name("John Ferryman"), new Place(new Name("somewhere")), new Amount(10));
-        NPC npc2 = new Ferryman(new Name("Expensive Ferryman"), new Place(new Name("far far away")), new Amount(100));
-
-        npcs = new ArrayList<>(List.of(npc1, npc2));
-
-        // randomly place the entities on the grid
-        // princess, player1, and player2 are placed at the same starting point.
-        gridState.setCell(0, 0, princess_npc);
+//        gridState.setCell(0, 0, princess_npc);
         gridState.setCell(0, 1, player1);
         gridState.setCell(0, 2, player2);
-        gridState.setCell(2, 1, item1);
 
         gridState.initializeGrid(enemies);
-        gridState.initializeGrid(items);
-//        gridState.initializeGrid(chests);
+//        gridState.initializeGrid(items);
+        gridState.initializeGrid(chests);
         gridState.initializeGrid(npcs);
     }
 
@@ -440,21 +466,15 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 p1Name + ", would you like to be an Assassin, or a Cleric?\n"
                 + "0 - Assassin\n"
                 + "1 - Cleric\n", 1);
-        PlayableCharacterUI p1UI;
-        PlayableCharacterUI p2UI;
         Cleric c = Cleric.getInstance(new Name(p1Choice == 1 ? p1Name : p2Name));
         Assassin a = Assassin.getInstance(new Name(p1Choice == 0 ? p1Name : p2Name));
         if (p1Choice == 1) {
             player1 = c;
             player2 = a;
-            p1UI = c.getUI();
-            p2UI = a.getUI();
             page.print(p1Name + " is the Cleric, " + p2Name + " is the Assassin\n");
         } else {
             player1 = a;
             player2 = c;
-            p1UI = a.getUI();
-            p2UI = c.getUI();
             page.print(p1Name + " is the Assassin, " + p2Name + " is the Cleric\n");
         }
 
@@ -493,8 +513,17 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
                 page.print("added "+item.getName()+" to inventory\n");
                 gridState.removeEntity(item);
             }
+            else if (targetCell.getTop() instanceof Princess) {
+                currentPlayer.pickUpPrincess();
+                page.print("You are now escorting the princess\n");
+            }
         }
-        return gridState.setCellWithChecking(targetCell, p);
+        Status status =  gridState.setCellWithChecking(targetCell, p);
+        if (!status.isFail()){
+            int[] pos = gridState.getLocationCords(targetCell);
+            condition.updateCondition(pos[0], pos[1], currentPlayer);
+        }
+        return status;
     }
 
     /**
@@ -515,7 +544,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
             // tell "Far....."
 //            page.print("destination is far...\n");
         }
-        return new Status(Status.Option.SUCCESS, "Destination is far...");
+        return new Status(Status.Option.FAIL, "Unimplemented as of yet.");
     }
 
     /**
@@ -525,6 +554,14 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      */
     public Status checkRunningCondition() {
         // learn to use actual WinCondition object here.
+        for (WinCondition wc : getWinConditions()){
+            if (wc.isLost()){
+                return new Status(Status.Option.DONE, wc.loseMessage().toString());
+            }
+            if (wc.isWon()){
+                return new Status(Status.Option.DONE, wc.winMessage().toString());
+            }
+        }
         if (player1.isDead() || player2.isDead()) {
             return new Status(Status.Option.DONE, "You died! You lost.");
         } else

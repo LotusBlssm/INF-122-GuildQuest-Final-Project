@@ -1,5 +1,6 @@
 package edu.uci.inf122.guildquest.ui;
 
+import edu.uci.inf122.guildquest.api.win_conditions.GetToTargetXYWithPrincessCondition;
 import edu.uci.inf122.guildquest.content.User;
 import edu.uci.inf122.guildquest.content.UserFactory;
 import edu.uci.inf122.guildquest.content.RealmFactory;
@@ -15,10 +16,15 @@ import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
 import edu.uci.inf122.guildquest.adventures.RaidGridState;
 import edu.uci.inf122.guildquest.adventures.TimedRaidAdventure;
+import edu.uci.inf122.guildquest.content.items.Item;
+import edu.uci.inf122.guildquest.content.items.ItemFactory;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
+import edu.uci.inf122.guildquest.entities.nonlivings.Chest;
+import edu.uci.inf122.guildquest.entities.npcs.Ferryman;
 import edu.uci.inf122.guildquest.entities.npcs.Goblin;
+import edu.uci.inf122.guildquest.entities.npcs.Princess;
 import edu.uci.inf122.guildquest.entities.playablecharacters.*;
 
 import edu.uci.inf122.guildquest.ui.Page;
@@ -65,6 +71,8 @@ public class AdventureUI {
         List<User> players = List.of(user, player2);
 
         List<WinCondition> winConditions = new ArrayList<>();
+
+        winConditions.add(new GetToTargetXYWithPrincessCondition(4,4));
         winConditions.add(new TimeLimitCondition(10));
 
         Realm realm = RealmFactory.createRealm(
@@ -72,11 +80,16 @@ public class AdventureUI {
                 new TimeRule(0, 1.0), 6, 6);
 
         EscortAdventure adventure = new EscortAdventure(
-                List.of(realm), new ArrayList<>(), winConditions, players);
+                List.of(realm),
+                EscortAdventure.defaultEntities(),
+                winConditions,
+                players);
 
         page.nextScreen();
         adventure.play();
     }
+
+
 
     private static void playTimedRaid(User user) {
         Page page = Page.getPage();

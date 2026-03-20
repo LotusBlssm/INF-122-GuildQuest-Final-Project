@@ -5,8 +5,9 @@ import edu.uci.inf122.guildquest.entities.domain_primitives.Amount;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Damage;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Health;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
+import edu.uci.inf122.guildquest.entities.interfaces.HasHealth;
 
-public abstract class NPC extends Entity {
+public abstract class NPC extends Entity implements HasHealth {
     protected Health health;
 
     public NPC(Name name, Health health) {

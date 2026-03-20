@@ -1,6 +1,7 @@
 package edu.uci.inf122.guildquest.api.win_conditions;
 
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
+import edu.uci.inf122.guildquest.entities.domain_primitives.Text;
 
 public class TimeLimitCondition extends WinCondition {
     private int timeLimitMinutes;
@@ -15,13 +16,22 @@ public class TimeLimitCondition extends WinCondition {
     }
 
     @Override
-    public boolean isWon(MiniAdventure m) {
-        return false; // time expiring is a lose condition, not a win
+    public boolean isWon() {
+        return false;
+    }
+    @Override
+    public boolean isLost() {
+        return timeElapsedMinutes >= timeLimitMinutes;
     }
 
     @Override
-    public boolean isLost(MiniAdventure m) {
-        return timeElapsedMinutes >= timeLimitMinutes;
+    public Text loseMessage() {
+        return new Text("You did not finish within the time");
+    }
+
+    @Override
+    public Text winMessage() {
+        return new Text("You finished within the time!");
     }
 
     public void updateCondition(int minutesToAdd) {

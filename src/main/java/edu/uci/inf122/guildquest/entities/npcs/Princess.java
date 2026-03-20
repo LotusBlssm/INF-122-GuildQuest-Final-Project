@@ -4,8 +4,9 @@ import edu.uci.inf122.guildquest.entities.domain_primitives.Amount;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Damage;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Health;
 import edu.uci.inf122.guildquest.entities.domain_primitives.Name;
+import edu.uci.inf122.guildquest.entities.interfaces.Absorbable;
 
-public class Princess extends NPC{
+public class Princess extends NPC implements Absorbable {
     private Amount walkingSpeed;
 
     public Princess(Name name, Health health, Amount walkingSpeed){

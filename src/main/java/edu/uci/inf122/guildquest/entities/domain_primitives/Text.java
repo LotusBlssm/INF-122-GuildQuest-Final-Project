@@ -6,4 +6,15 @@ public class Text {
         if (text==null) throw new IllegalArgumentException("text cannot be null");
         this.text = text;
     }
+    public Text add(Text other){
+        return new Text(text+other.text);
+    }
+    public Text addWithSpace(Text other){
+        return text.isEmpty() ? other : new Text(text+' '+other.text);
+    }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }
