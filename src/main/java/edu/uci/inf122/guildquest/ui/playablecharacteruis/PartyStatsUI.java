@@ -81,10 +81,6 @@ public class PartyStatsUI {
         }
 
         printBorder(statColWidth, valueColWidths);
-
-        for (PlayableCharacter c : characters){
-            c.getUI().display();
-        }
     }
 
     private Map<String, String> extractStats(PlayableCharacter character) {
@@ -93,7 +89,7 @@ public class PartyStatsUI {
         // Common stats
         stats.put("Name", character.getName().toString());
         stats.put("Class", character.getCharacterClass().toString());
-        stats.put("Level", String.valueOf(character.getLevel()));
+        stats.put("Level", String.valueOf(character.getLevel().getLevelInt()));
         stats.put("Health", String.valueOf(character.getHealth().getHealth()));
         stats.put("Escorting Princess", String.valueOf(character.getWithPrincess().isWithPrincess()));
 
