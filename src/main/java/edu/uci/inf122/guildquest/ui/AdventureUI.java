@@ -6,7 +6,6 @@ import edu.uci.inf122.guildquest.content.RealmFactory;
 import edu.uci.inf122.guildquest.content.Realm;
 import edu.uci.inf122.guildquest.content.TimeRule;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +13,9 @@ import edu.uci.inf122.guildquest.adventures.EscortAdventure;
 import edu.uci.inf122.guildquest.api.win_conditions.RaidClearCondition;
 import edu.uci.inf122.guildquest.api.win_conditions.TimeLimitCondition;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
+import edu.uci.inf122.guildquest.adventures.RaidGridState;
+import edu.uci.inf122.guildquest.adventures.TimedRaidAdventure;
 import edu.uci.inf122.guildquest.engine.MiniAdventure;
-import edu.uci.inf122.guildquest.engine.RaidGridState;
-import edu.uci.inf122.guildquest.engine.TimedRaidAdventure;
 import edu.uci.inf122.guildquest.entities.Entity;
 import edu.uci.inf122.guildquest.entities.domain_primitives.*;
 import edu.uci.inf122.guildquest.entities.npcs.Goblin;
@@ -52,13 +51,31 @@ public class AdventureUI {
             i = page.acceptIntUntil(prompt, 2);
             switch (i) {
                 case 0 -> System.out.print("");
-                case 1 -> {
-                    // TODO: Escort Adventure
-                    System.out.println("Escort Adventure is not yet available.");
-                }
+                case 1 -> playEscortAdventure(user);
                 case 2 -> playTimedRaid(user);
             }
         }
+    }
+
+    private static void playEscortAdventure(User user) {
+        Page page = Page.getPage();
+        page.nextScreen();
+        String player2Name = page.acceptStr("Enter Player 2 username: ");
+        User player2 = UserFactory.createUser(player2Name);
+        List<User> players = List.of(user, player2);
+
+        List<WinCondition> winConditions = new ArrayList<>();
+        winConditions.add(new TimeLimitCondition(10));
+
+        Realm realm = RealmFactory.createRealm(
+                "Escort Realm", "A dangerous escort mission",
+                new TimeRule(0, 1.0), 6, 6);
+
+        EscortAdventure adventure = new EscortAdventure(
+                List.of(realm), new ArrayList<>(), winConditions, players);
+
+        page.nextScreen();
+        adventure.play();
     }
 
     private static void playTimedRaid(User user) {

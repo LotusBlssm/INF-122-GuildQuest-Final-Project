@@ -535,13 +535,13 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      * @param args the input arguments
      */
     public static void main(String[] args) {
-        List<WinCondition> winConditions = List.of(new TimeLimitCondition(new Time(2)));
+        List<WinCondition> winConditions = List.of(new TimeLimitCondition(10));
 
         EscortAdventure adventure = new EscortAdventure(
-                null,
-                null,
+                new ArrayList<>(),
+                new ArrayList<>(),
                 winConditions,
-                null);
+                new ArrayList<>());
 
         adventure.play();
     }
