@@ -1,4 +1,4 @@
-package edu.uci.inf122.guildquest.engine;
+package edu.uci.inf122.guildquest.adventures;
 
 import edu.uci.inf122.guildquest.api.AdventureSnapshot;
 import edu.uci.inf122.guildquest.api.Status;
@@ -7,6 +7,7 @@ import edu.uci.inf122.guildquest.api.state.GridCell;
 import edu.uci.inf122.guildquest.api.state.GridState;
 import edu.uci.inf122.guildquest.api.state.State;
 import edu.uci.inf122.guildquest.api.win_conditions.WinCondition;
+import edu.uci.inf122.guildquest.engine.MiniAdventure;
 import edu.uci.inf122.guildquest.content.Realm;
 import edu.uci.inf122.guildquest.content.User;
 import edu.uci.inf122.guildquest.entities.Entity;

@@ -1,4 +1,4 @@
-package edu.uci.inf122.guildquest.engine;
+package edu.uci.inf122.guildquest.adventures;
 
 import edu.uci.inf122.guildquest.api.state.GridState;
 
