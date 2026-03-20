@@ -88,6 +88,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     private List<Entity> npcs;
     private final static Page page = Page.getPage();
     private PlayableCharacter currentPlayer;
+    private List<User> players;
     // nice to have: difficulty levels that change the # of enemies and the size of
     // the grid, etc.
 
@@ -102,6 +103,7 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
     public EscortAdventure(List<Realm> realms, List<Entity> entities, List<WinCondition> winCondition,
             List<User> players) {
         super(realms, entities, winCondition, players);
+        this.players = players;
         gridState = new TerminalGrid(6, 6);
         // pick a character and tools for the player: (PLACEHOLDER FOR NOW)
         // player1 = Assassin.getInstance(new Name("assassin")); // placeholder
@@ -431,29 +433,29 @@ public class EscortAdventure extends MiniAdventure { // extends MiniAdventure {
      * Initialize user to be either Assassin or Cleric
      */
     public void initializeUser() {
-        // logic to set up the user, which user is with the NPC, etc.
-        // ask UI which characters they would like to be.
-        int p1Choice = page.acceptIntUntil("""
-                Player 1, would you like to be an Assassin, or a Cleric?
-                0 - Assassin
-                1 - Cleric
-                """, 1);
+        String p1Name = (players != null && !players.isEmpty()) ? players.get(0).getUsername() : "Player 1";
+        String p2Name = (players != null && players.size() > 1) ? players.get(1).getUsername() : "Player 2";
+
+        int p1Choice = page.acceptIntUntil(
+                p1Name + ", would you like to be an Assassin, or a Cleric?\n"
+                + "0 - Assassin\n"
+                + "1 - Cleric\n", 1);
         PlayableCharacterUI p1UI;
         PlayableCharacterUI p2UI;
-        Cleric c = Cleric.getInstance(new Name("Mary"));
-        Assassin a = Assassin.getInstance(new Name("Dante"));
+        Cleric c = Cleric.getInstance(new Name(p1Choice == 1 ? p1Name : p2Name));
+        Assassin a = Assassin.getInstance(new Name(p1Choice == 0 ? p1Name : p2Name));
         if (p1Choice == 1) {
             player1 = c;
             player2 = a;
             p1UI = c.getUI();
             p2UI = a.getUI();
-            page.print("Player 1 is the Cleric, player 2 is the Assassin\n");
+            page.print(p1Name + " is the Cleric, " + p2Name + " is the Assassin\n");
         } else {
             player1 = a;
             player2 = c;
             p1UI = a.getUI();
             p2UI = c.getUI();
-            page.print("Player 1 is the Assassin, player 2 is the Cleric\n");
+            page.print(p1Name + " is the Assassin, " + p2Name + " is the Cleric\n");
         }
 
         PartyStatsUI partyStats = new PartyStatsUI(player1, player2);
